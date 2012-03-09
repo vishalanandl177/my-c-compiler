@@ -1,5 +1,6 @@
 package MyGCC;
 import java_cup.runtime.SymbolFactory;
+import java_cup.runtime.*;
 
 %%
 
@@ -57,9 +58,8 @@ IDENT = {ALPHA}({ALPHA_NUM})*
 "exit"		{return sf.newSymbol("Exit instruction", sym.EXIT); }
 "return"	{return sf.newSymbol("Return instruction", sym.RETURN); }
 
-{IDENT}		{return sf.newSymbol("Identificator", sym.IDENT); }
-
+{IDENT}		{return sf.newSymbol("Identificator", sym.IDENT, new String(yytext())); }
 [0-9]+ 		{return sf.newSymbol("Integral Number",sym.NB_INT, new Integer(yytext())); }
 
 [ \t\r\n\f] { /* ignore white space. */ }
-. 			{ System.err.println("Illegal character: "+yytext()); }
+. 			{ System.err.println("Illegal character: " + yytext()); }
