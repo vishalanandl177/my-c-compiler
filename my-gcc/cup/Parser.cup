@@ -44,14 +44,10 @@ non terminal program, declarations_list, declaration, prototype, type, types_seq
 			args_list, bin_op;
 
 
+precedence left OR, AND;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV, MOD;
-precedence left OR, AND, NOT;
-precedence left IF, ELSE;
-precedence left IDENT;
-precedence left INT, VOID;
-precedence nonassoc EQUALS, DIFF, GREATER, LESS, LEQL, GEQL;
-
+precedence nonassoc EQUALS, DIFF, GREATER, LESS, LEQL, GEQL, IF, ELSE, NOT, INT, VOID;
 
 	    
 program ::= declarations_list functions_list;
