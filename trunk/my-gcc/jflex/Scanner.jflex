@@ -22,7 +22,27 @@ ALPHA = [a-zA-Z_]
 ALPHA_NUM = {ALPHA}|[0-9]
 IDENT = {ALPHA}({ALPHA_NUM})*
 
+NEWLINE = \n | \u2028 | \u2029 | \u000B | \u000C | \u0085
+
+%xstates MULTI_COMMENT, MONO_COMMENT
+
 %%
+
+<MONO_COMMENT> {
+{NEWLINE}		{yybegin(YYINITIAL);}
+.				{}
+}
+
+
+<MULTI_COMMENT>{ 
+\*\/			{yybegin(YYINITIAL);}
+. | {NEWLINE}	{}
+}
+
+<YYINITIAL>{
+
+\/\/		{yybegin(MONO_COMMENT);}
+\/\*		{yybegin(MULTI_COMMENT);}
 
 "=="		{return sf.newSymbol("Equals",sym.EQUALS); }
 "!="		{return sf.newSymbol("Different",sym.DIFF); }
@@ -61,5 +81,6 @@ IDENT = {ALPHA}({ALPHA_NUM})*
 {IDENT}		{return sf.newSymbol("Identificator", sym.IDENT, new String(yytext())); }
 [0-9]+ 		{return sf.newSymbol("Integral Number",sym.NB_INT, new Integer(yytext())); }
 
-[ \t\r\n\f] { /* ignore white space. */ }
+[ \t\r\f] | {NEWLINE} { /* ignore white space. */ }
 . 			{ System.err.println("Illegal character: " + yytext()); }
+}
