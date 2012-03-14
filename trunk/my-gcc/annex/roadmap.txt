@@ -1,0 +1,33 @@
+----------------------------
+| C-COMPILER CONTENT       |
+----------------------------
+
+-> Grammar
+   -> jflex
+   -> cup
+-> Code generation
+   -> via cup
+-> Identifier managing
+   -> Context
+      -> global
+      -> function
+      -> block
+   -> HashMap<String, Variable>
+   -> Variable
+      -> identifier
+      -> function
+      	 -> return type
+	 -> argument
+	 -> ? associated code ?
+      -> var
+      	 -> type
+	 -> ? array ?
+	 -> ? pointer ?
+
+
+
+
+
+
+
+-> error recovery
