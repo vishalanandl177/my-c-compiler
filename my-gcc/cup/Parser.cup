@@ -41,44 +41,72 @@ terminal Integer NB_INT;
 non terminal program, declarations_list, declaration, prototype, type, types_sequence,
 			types_list, functions_list, function, header, param_sequence, param_list,
 			parameter, body, instruct_list, instruction, expression, arg_sequence,
-			args_list, bin_op;
+			args_list, bin_op, dec_func_list, dec_end, proto_func, hybrid_param, 
+			dec_or_func_end, arr, arr_proto;
 
 
 precedence left OR, AND;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV, MOD;
-precedence nonassoc EQUALS, DIFF, GREATER, LESS, LEQL, GEQL, IF, ELSE, NOT, INT, VOID;
+precedence nonassoc EQUALS, DIFF, GREATER, LESS, LEQL, GEQL, IF, ELSE, NOT;
 
 	    
-program ::= declarations_list functions_list;
+program ::= dec_func_list;
 
+dec_func_list ::= STATIC type IDENT arr SEMI dec_func_list
+				| type IDENT dec_end 
+				| VOID IDENT proto_func;
+				
+dec_end ::= arr SEMI dec_func_list
+	     | proto_func
+	     ;
+	     
+	     
+arr ::= LHOOK NB_INT RHOOK
+	  |
+	  ;
+	     
+proto_func ::= LPAREN hybrid_param;
+
+
+			
+hybrid_param ::= types_list RPAREN SEMI dec_func_list
+			   | param_list RPAREN LBRACKET body RBRACKET functions_list
+			   | VOID RPAREN dec_or_func_end
+			   ;
+			   
+dec_or_func_end ::= SEMI dec_func_list
+				| LBRACKET body RBRACKET functions_list
+				;
+			
 declarations_list ::= declaration SEMI declarations_list
 					|
 					;
 					
-declaration ::= INT IDENT
-			| STATIC INT IDENT
-			| INT IDENT LHOOK NB_INT RHOOK
-			| STATIC INT IDENT LHOOK NB_INT RHOOK
-			| prototype
+declaration ::= type IDENT arr_proto
+			| STATIC type IDENT arr
+			| VOID IDENT prototype
 			;
 			
-prototype ::= type IDENT LPAREN types_sequence RPAREN;
+arr_proto ::= arr
+			| prototype;
+			
+prototype ::= LPAREN types_sequence RPAREN;
 
-type ::= VOID
-		| INT
+
+type ::= INT
 		;
 		
 types_sequence ::= VOID
 				| types_list
 				;
 
-types_list ::= INT
-			| INT COMMA types_list
+types_list ::= type
+			| type COMMA types_list
 			;
 			
-functions_list ::= function
-				| function functions_list
+functions_list ::= function functions_list
+				|
 				;
 				
 function ::= header LBRACKET body RBRACKET;
