@@ -7,21 +7,29 @@ import java.util.*;
 parser code {:
 
 	static Parser p;
+	private PrintStream ps;
+
+	Parser(Scanner s, SymbolFactory sf, PrintStream ps){
+		       super(s,sf);
+		       this.ps = ps;
+	}
 
 	public static void main(String args[]) throws Exception {
 		SymbolFactory sf = new DefaultSymbolFactory();
+		String destination_file;
 
-		if (args.length==0){
-			p = new Parser(new Scanner(System.in,sf),sf);
-			p.debug_parse();
-			//p.parse();
-			}
-			
-		else{
-			p = new Parser(new Scanner(new java.io.FileInputStream(args[0]),sf),sf);
-			p.debug_parse();
-			//p.parse();
-			}
+		if (args.length >= 2)
+		   destination_file = args[1];
+		else
+		   destination_file = args[0].substring(0,args[0].lastIndexOf('.')) + ".s";
+
+		System.out.println("Writing to : " + destination_file);
+		p = new Parser(new Scanner(new FileInputStream(args[0]),sf),sf, new PrintStream(destination_file));
+		p.ps.println("\t.file \""+ args[0]+"\"");
+		System.out.println("modified version");
+		//p.debug_parse();
+		p.parse();
+		p.ps.close();
 	}
 	
 	public void syntax_error(Symbol cur_token) {		//overloads the default method

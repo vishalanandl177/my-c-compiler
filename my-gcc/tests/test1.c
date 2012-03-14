@@ -1,13 +1,7 @@
-#include <stdio.h>
-int global;
+int addition(int,int);
 
-void affichage(int i){
-  printf("value : %d ", global);
-}
-
-int main(int argc, char ** argv){
-  int f(void);
-  global = 0;
-  affichage(global);
-  return 0;
+int addition(int a,int b){
+  int c;
+  c = a+b;
+  return c;
 }
