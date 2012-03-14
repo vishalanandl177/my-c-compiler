@@ -6,51 +6,60 @@ import java.util.*;
 
 parser code {:
 
-	static Parser p;
-	private PrintStream ps;
+  static Parser p;
+  private PrintStream ps;
 
-	Parser(Scanner s, SymbolFactory sf, PrintStream ps){
-		       super(s,sf);
-		       this.ps = ps;
-	}
+  Parser(Scanner s, SymbolFactory sf, PrintStream ps){
+    super(s,sf);
+    this.ps = ps;
+  }
 
-	public static void main(String args[]) throws Exception {
-		SymbolFactory sf = new DefaultSymbolFactory();
-		String destination_file;
+  public static void main(String args[]) throws Exception {
+    SymbolFactory sf = new DefaultSymbolFactory();
+    String destination_file;
 
-		if (args.length >= 2)
-		   destination_file = args[1];
-		else
-		   destination_file = args[0].substring(0,args[0].lastIndexOf('.')) + ".s";
+    if (args.length >= 2)
+      destination_file = args[1];
+    else
+      destination_file = args[0].substring(0,args[0].lastIndexOf('.')) + ".s";
 
-		System.out.println("Writing to : " + destination_file);
-		p = new Parser(new Scanner(new FileInputStream(args[0]),sf),sf, new PrintStream(destination_file));
-		p.ps.println("\t.file \""+ args[0]+"\"");
-		System.out.println("modified version");
-		//p.debug_parse();
-		p.parse();
-		p.ps.close();
-	}
-	
-	public void syntax_error(Symbol cur_token) {		//overloads the default method
-		report_error("*** Syntax Error at line " + (cur_token.left+1) +", column " + cur_token.right + " ***", null);
-		p.debug_stack();
-		p.debug_shift(cur_token);
-}
+    System.out.println("Writing to : " + destination_file);
+    p = new Parser(new Scanner(new FileInputStream(args[0]),sf),
+                               sf,
+                               new PrintStream(destination_file));
+    p.ps.println("\t.file \""+ args[0]+"\"");
+    System.out.println("modified version");
+    //p.debug_parse();
+    p.parse();
+    p.ps.close();
+  }
+  
+  public void syntax_error(Symbol cur_token) { //overloads the default method
+    report_error("*** Syntax Error at line "
+                 + (cur_token.left+1)
+                 + ", column "
+                 + cur_token.right
+                 + " ***",
+                 null);
+    p.debug_stack();
+    p.debug_shift(cur_token);
+  }
 :}
 
 terminal INT, VOID, STATIC, LHOOK, RHOOK, LPAREN, RPAREN, LBRACKET, RBRACKET,
-		COMMA, SEMI, EQL, EXIT, RETURN, READ_INT, IF, ELSE, WHILE, MINUS,
-		NOT, LESS, GREATER, EQUALS, LEQL, GEQL, DIFF, PLUS, TIMES, DIV, MOD, OR, AND;
-		
+         COMMA, SEMI, EQL, EXIT, RETURN, READ_INT, IF, ELSE, WHILE, MINUS,
+         NOT, LESS, GREATER, EQUALS, LEQL, GEQL, DIFF, PLUS, TIMES, DIV, MOD,
+         OR, AND;
+    
 terminal String IDENT;
 terminal Integer NB_INT;
 
-non terminal program, declarations_list, declaration, prototype, type, types_sequence,
-			types_list, functions_list, function, header, param_sequence, param_list,
-			parameter, body, instruct_list, instruction, expression, arg_sequence,
-			args_list, bin_op, dec_func_list, dec_end, proto_func, hybrid_param, 
-			dec_or_func_end, arr, arr_proto;
+non terminal program, declarations_list, declaration, prototype, type,
+             types_sequence, types_list, functions_list, function, header,
+             param_sequence, param_list, parameter, body, instruct_list,
+             instruction, expression, arg_sequence, args_list, bin_op,
+             dec_func_list, dec_end, proto_func, hybrid_param, dec_or_func_end,
+             arr, arr_proto;
 
 
 precedence left OR, AND;
@@ -58,130 +67,161 @@ precedence left PLUS, MINUS;
 precedence left TIMES, DIV, MOD;
 precedence nonassoc EQUALS, DIFF, GREATER, LESS, LEQL, GEQL, IF, ELSE, NOT;
 
-	    
+      
 program ::= dec_func_list;
 
-dec_func_list ::= STATIC type IDENT arr SEMI dec_func_list
-				| type IDENT dec_end 
-				| VOID IDENT proto_func;
-				
-dec_end ::= arr SEMI dec_func_list
-	     | proto_func
-	     ;
-	     
-	     
-arr ::= LHOOK NB_INT RHOOK
-	  |
-	  ;
-	     
-proto_func ::= LPAREN hybrid_param;
+dec_func_list ::=
+    STATIC type IDENT arr SEMI dec_func_list
+  | type IDENT dec_end 
+  | VOID IDENT proto_func
+  ;
+        
+dec_end ::=
+    arr SEMI dec_func_list
+  | proto_func
+  ;
+       
+       
+arr ::=
+    LHOOK NB_INT RHOOK
+  |
+  ;
+       
+proto_func ::=
+    LPAREN hybrid_param
+  ;
+      
+hybrid_param ::=
+    types_list RPAREN SEMI dec_func_list
+  | param_list RPAREN LBRACKET body RBRACKET functions_list
+  | VOID RPAREN dec_or_func_end
+  ;
+         
+dec_or_func_end ::=
+    SEMI dec_func_list
+  | LBRACKET body RBRACKET functions_list
+  ;
+      
+declarations_list ::=
+    declaration SEMI declarations_list
+  |
+  ;
+          
+declaration ::=
+    type IDENT arr_proto
+  | STATIC type IDENT arr
+  | VOID IDENT prototype
+  ;
+      
+arr_proto ::=
+    arr
+  | prototype
+  ;
+      
+prototype ::=
+    LPAREN types_sequence RPAREN
+  ;
 
 
-			
-hybrid_param ::= types_list RPAREN SEMI dec_func_list
-			   | param_list RPAREN LBRACKET body RBRACKET functions_list
-			   | VOID RPAREN dec_or_func_end
-			   ;
-			   
-dec_or_func_end ::= SEMI dec_func_list
-				| LBRACKET body RBRACKET functions_list
-				;
-			
-declarations_list ::= declaration SEMI declarations_list
-					|
-					;
-					
-declaration ::= type IDENT arr_proto
-			| STATIC type IDENT arr
-			| VOID IDENT prototype
-			;
-			
-arr_proto ::= arr
-			| prototype;
-			
-prototype ::= LPAREN types_sequence RPAREN;
+type ::=
+    INT
+  ;
+    
+types_sequence ::=
+    VOID
+  | types_list
+  ;
 
+types_list ::=
+    type
+  | type COMMA types_list
+  ;
+      
+functions_list ::=
+    function functions_list
+  |
+  ;
+        
+function ::=
+    header LBRACKET body RBRACKET
+  ;
 
-type ::= INT
-		;
-		
-types_sequence ::= VOID
-				| types_list
-				;
+header ::=
+    type IDENT LPAREN param_sequence RPAREN
+  ;
 
-types_list ::= type
-			| type COMMA types_list
-			;
-			
-functions_list ::= function functions_list
-				|
-				;
-				
-function ::= header LBRACKET body RBRACKET;
+param_sequence ::=
+    VOID
+  | param_list
+  ;
 
-header ::= type IDENT LPAREN param_sequence RPAREN;
+param_list ::=
+    parameter
+  | parameter COMMA param_list
+  ;
+      
+parameter ::=
+    INT IDENT
+  | INT IDENT LHOOK NB_INT RHOOK
+  ;
+      
+body ::=
+    declarations_list instruct_list
+  ;
 
-param_sequence ::= VOID
-				| param_list
-				;
-
-param_list ::= parameter
-			| parameter COMMA param_list
-			;
-			
-parameter ::= INT IDENT
-			| INT IDENT LHOOK NB_INT RHOOK
-			;
-			
-body ::= declarations_list instruct_list;
-
-instruct_list ::= instruction SEMI instruct_list
-				|
-				;
-				
-instruction ::= IDENT EQL expression
-			  | IDENT LHOOK expression RHOOK EQL expression
-			  | EXIT LPAREN NB_INT RPAREN
-			  | RETURN expression
-			  | RETURN
-			  | READ_INT LPAREN IDENT RPAREN
-			  | IF LPAREN expression RPAREN instruction ELSE instruction
-			  | IF LPAREN expression RPAREN instruction
-			  | WHILE LPAREN expression RPAREN instruction
-			  | LBRACKET instruct_list RBRACKET
-			  | expression
-			  ;
-			  
-expression ::= expression bin_op expression
-			 | MINUS expression
-			 | NOT expression
-			 | LPAREN expression RPAREN
-			 | IDENT
-			 | NB_INT
-			 | IDENT LPAREN arg_sequence RPAREN
-			 | IDENT LHOOK expression RHOOK
-			 ;
-			 
-arg_sequence ::= args_list
-				|
-				;
-				
-args_list ::= expression
-			| expression COMMA args_list
-			;
-			
-bin_op ::= LESS
-		 | GREATER
-		 | EQUALS
-		 | LEQL
-		 | GEQL
-		 | DIFF
-		 | PLUS
-		 | MINUS
-		 | TIMES
-		 | DIV
-		 | MOD
-		 | OR
-		 | AND
-		 ;
-		 
+instruct_list ::=
+    instruction SEMI instruct_list
+  |
+  ;
+        
+instruction ::=
+    IDENT EQL expression
+  | IDENT LHOOK expression RHOOK EQL expression
+  | EXIT LPAREN NB_INT RPAREN
+  | RETURN expression
+  | RETURN
+  | READ_INT LPAREN IDENT RPAREN
+  | IF LPAREN expression RPAREN instruction ELSE instruction
+  | IF LPAREN expression RPAREN instruction
+  | WHILE LPAREN expression RPAREN instruction
+  | LBRACKET instruct_list RBRACKET
+  | expression
+  ;
+        
+expression ::=
+    expression bin_op expression
+  | MINUS expression
+  | NOT expression
+  | LPAREN expression RPAREN
+  | IDENT
+  | NB_INT
+  | IDENT LPAREN arg_sequence RPAREN
+  | IDENT LHOOK expression RHOOK
+  ;
+       
+arg_sequence ::= 
+    args_list
+  |
+  ;
+        
+args_list ::=
+    expression
+  | expression COMMA args_list
+  ;
+      
+bin_op ::=
+    LESS
+  | GREATER
+  | EQUALS
+  | LEQL
+  | GEQL
+  | DIFF
+  | PLUS
+  | MINUS
+  | TIMES
+  | DIV
+  | MOD
+  | OR
+  | AND
+  ;
+     
