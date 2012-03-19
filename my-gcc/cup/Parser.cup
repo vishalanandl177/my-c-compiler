@@ -4,10 +4,16 @@ import java_cup.runtime.*;
 import java.io.*;
 import java.util.*;
 
+
+action code {:
+  public CodeGenerator cg = new CodeGenerator();
+
+:}
+
 parser code {:
 
-  static Parser p;
-  private PrintStream ps;
+  public static Parser p;
+  public PrintStream ps;
 
   Parser(Scanner s, SymbolFactory sf, PrintStream ps){
     super(s,sf);
@@ -92,7 +98,11 @@ proto_func ::=
   ;
       
 hybrid_param ::=
-    types_list RPAREN SEMI dec_func_list
+    types_list:typeList RPAREN SEMI
+                      {:
+                        cg.pushInformation(new TypeListResult(typeList));
+                        cg.declareFunction();
+                      :} dec_func_list
   | param_list RPAREN LBRACKET body RBRACKET functions_list
   | VOID RPAREN dec_or_func_end
   ;
