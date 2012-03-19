@@ -1,4 +1,4 @@
-package My;
+package MyGCC;
 
 public enum Type {
   INT(true),
