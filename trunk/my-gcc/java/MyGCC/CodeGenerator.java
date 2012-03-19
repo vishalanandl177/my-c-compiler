@@ -4,7 +4,10 @@ import java.util.Stack;
 import java.util.LinkedList;
 
 public class CodeGenerator{
+
   private LinkedList<Stack<ParsingResult>> myStack;
+
+  private Context globalcontext;
 
   public CodeGenerator(){
     myStack = new LinkedList<Stack<ParsingResult>>();
@@ -18,6 +21,10 @@ public class CodeGenerator{
 
   public void openNewContext(){
     myStack.add(new Stack<ParsingResult>());
+  }
+
+  public void declareFunction(){
+    
   }
 
   

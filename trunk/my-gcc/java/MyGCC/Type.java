@@ -1,11 +1,11 @@
-package MYGCC;
+package My;
 
 public enum Type {
   INT(true),
   VOID(false);
   
-  private Type(boolean ia, ) {
-    this.isVarType = b;
+  private Type(boolean ia) {
+    this.isVarType = ia;
   }
   
   private boolean isVarType;

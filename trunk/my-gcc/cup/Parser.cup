@@ -117,7 +117,7 @@ hybrid_param ::=
     // a function may follow
     types_list:typeList RPAREN SEMI
                       {:
-                        cg.pushInformation(new TypeListResult(typeList));
+                        cg.pushInformation((ArrayList<Type>)typeList);
                         cg.declareFunction();
                       :} dec_func_list
     
