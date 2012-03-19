@@ -2,6 +2,7 @@ package MyGCC;
 
 import java.util.Stack;
 import java.util.LinkedList;
+import java.io.*;
 
 public class CodeGenerator{
 
@@ -27,5 +28,12 @@ public class CodeGenerator{
     
   }
 
+  public void generateArithmeticResult(ArithmeticResult ar, PrintStream ps){
+	ps.println(ar.getOp() + " " + ar.getLeft() + " " + ar.getRight());
+  }
+
   
+  public void generateArithmeticLoad(String id, String registry, PrintStream ps){
+	ps.println("  load " + id + " " + registry);
+  }
 }
