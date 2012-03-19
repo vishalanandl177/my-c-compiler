@@ -75,7 +75,7 @@ precedence nonassoc EQUALS, DIFF, GREATER, LESS, LEQL, GEQL, IF, ELSE, NOT;
 
 // A program is a list of declarations and functions
 program ::= dec_func_list;
-'s 
+
 // Defines the structure of declarations and functions
 dec_func_list ::=
 
@@ -223,7 +223,7 @@ header ::=
 param_sequence ::=
     
     // The function requires no arguments
-    VOID's
+    VOID
     
     // The function requires at least one argument
   | param_list
@@ -281,7 +281,7 @@ instruction ::=
   
     // Basic "if else" test on an expression
   | IF LPAREN expression RPAREN instruction ELSE instruction
-  's
+
     // Simple "if" test on an expression
   | IF LPAREN expression RPAREN instruction
   
