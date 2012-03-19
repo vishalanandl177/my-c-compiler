@@ -73,15 +73,24 @@ precedence left PLUS, MINUS;
 precedence left TIMES, DIV, MOD;
 precedence nonassoc EQUALS, DIFF, GREATER, LESS, LEQL, GEQL, IF, ELSE, NOT;
 
-      
+// A program is a list of declarations and functions
 program ::= dec_func_list;
-
+'s 
+// Defines the structure of declarations and functions
 dec_func_list ::=
+
+    // Format for the declaration of a static variable, each declaration is
+    // seperated by a semicolon
     STATIC type IDENT arr SEMI dec_func_list
+    
+    // Format for the declaration of a non-static variable, or a prototype
   | type IDENT dec_end 
+  
+    // Format for the prototype of a function with void return type
   | VOID IDENT proto_func
   ;
         
+// End of the declaration a non-static variable or of a function's prototype
 dec_end ::=
     arr SEMI dec_func_list
   | proto_func
@@ -89,46 +98,85 @@ dec_end ::=
        
        
 arr ::=
+    // A declaration or a prototype may contain an Array of.
+    // Therefore it wile be of the for [NUM]
     LHOOK NB_INT RHOOK
-  |
+    // It may also be empty
+  |							 				
   ;
-       
+   
+// Beginning of the parameters of a function's prototype
 proto_func ::=
     LPAREN hybrid_param
   ;
       
+// Format of the parameters of a function or prototype
 hybrid_param ::=
+
+    // A list of types ending with a semicolon, another declaration or
+    // a function may follow
     types_list:typeList RPAREN SEMI
                       {:
                         cg.pushInformation(new TypeListResult(typeList));
                         cg.declareFunction();
                       :} dec_func_list
+    
+    // List of the arguments for a function.
+    // a function ends with a }
   | param_list RPAREN LBRACKET body RBRACKET functions_list
+  
+    // The function may require no parameters, a declaration or function
+    // may ensue
   | VOID RPAREN dec_or_func_end
   ;
-         
+
+// Describes the end of a Declaration or a Function
 dec_or_func_end ::=
+
+    // All declarations end with a semicolon, and may be
+    // followed by either a function of a declarion
     SEMI dec_func_list
+    
+    // If we have a function, it will be ended by { code }
+    // And followed by a list of functions
   | LBRACKET body RBRACKET functions_list
   ;
-      
+
+// Defines the constraints of a list of declarations
 declarations_list ::=
+
+    // All declarations are separated by a semicolon
     declaration SEMI declarations_list
   |
   ;
-          
+  
+// Declaration of either a variable the prototype of a function.
 declaration ::=
+
+    // A declaration must contain a type (int, float, void, ect...)
+    // an identifier (name of the variable of function)
+    // and either an array, or the rest of a function's prototype
     type IDENT arr_proto
+    
+    // A variable may be declared as static
   | STATIC type IDENT arr
+  
+    // a function may be have a VOID return type
   | VOID IDENT prototype
   ;
       
+// Determines if we are dealing with the declaration of a variable
+// or a prototype and reduces accordingly
 arr_proto ::=
     arr
   | prototype
   ;
       
+// Definition of the part of a function's prototype that differs from
+// the declaration of a variable
 prototype ::=
+
+    // Represent the types of the arguments the function will take
     LPAREN types_sequence RPAREN
   ;
 
@@ -137,21 +185,32 @@ type ::=
     INT
   ;
     
+// A sequence of types for the prototype of a function
 types_sequence ::=
+
+    // A function may require no arguments, type is VOID
     VOID
+    
+    // If the function requires arguments, it will be a types_list
   | types_list
   ;
 
+
+// Used for defining the types required for the arguments of a function
 types_list ::=
     type
+    
+    // each variable type is seperated by a comma
   | type COMMA types_list
   ;
       
+// List of functions. It may be empty
 functions_list ::=
     function functions_list
   |
   ;
         
+// Core structure of a function in C
 function ::=
     header LBRACKET body RBRACKET
   ;
@@ -160,44 +219,82 @@ header ::=
     type IDENT LPAREN param_sequence RPAREN
   ;
 
+// Determines whether the function requires any arguments
 param_sequence ::=
-    VOID
+    
+    // The function requires no arguments
+    VOID's
+    
+    // The function requires at least one argument
   | param_list
   ;
 
+// A list of parameters, each seperated by a comma.
 param_list ::=
+
+    // a param_list may contain a single parameter
     parameter
   | parameter COMMA param_list
   ;
       
+// A parameter MUST be a variable
 parameter ::=
+
     INT IDENT
+    
+    // The variable can be an array
   | INT IDENT LHOOK NB_INT RHOOK
   ;
-      
+     
+// The body of a function is composed of declarations and instructions
 body ::=
     declarations_list instruct_list
   ;
 
+// A list of instructions, each separated by semicolons
 instruct_list ::=
     instruction SEMI instruct_list
   |
   ;
         
+// Every instruction which can be performed
 instruction ::=
+    
+    // Compare the value of a variable with that of an expression
     IDENT EQL expression
+    
+    // Compare the value of an item from an array with that of an expression
+    // The index may be obtained with an expression
   | IDENT LHOOK expression RHOOK EQL expression
+  
+    // Exit with status NB_INT
   | EXIT LPAREN NB_INT RPAREN
+  
+    // Return the value of an expression
   | RETURN expression
+  
+    // Return no value
   | RETURN
+  
+    // 
   | READ_INT LPAREN IDENT RPAREN
+  
+    // Basic "if else" test on an expression
   | IF LPAREN expression RPAREN instruction ELSE instruction
+  's
+    // Simple "if" test on an expression
   | IF LPAREN expression RPAREN instruction
+  
+    // Basic "while" instruction
   | WHILE LPAREN expression RPAREN instruction
+  
+    // Allow for the use of multiple instructions (for instance
+    // after an if, or a while
   | LBRACKET instruct_list RBRACKET
   | expression
   ;
         
+// Defines the list of possible expressions to be used
 expression ::=
     expression bin_op expression
   | MINUS expression
@@ -205,20 +302,28 @@ expression ::=
   | LPAREN expression RPAREN
   | IDENT
   | NB_INT
+  
+    // Allows the use of a function in an expression
   | IDENT LPAREN arg_sequence RPAREN
+  
+    // Allows the use of arrays with expression calculated indexes
   | IDENT LHOOK expression RHOOK
   ;
-       
+  
+// Can be either empty, or a list of arguments
 arg_sequence ::= 
     args_list
   |
   ;
         
+// A list of expressions, each seperated by a comma
+// An args_list may not be empty
 args_list ::=
     expression
   | expression COMMA args_list
   ;
-      
+     
+// List of accepted binary operators
 bin_op ::=
     LESS
   | GREATER
