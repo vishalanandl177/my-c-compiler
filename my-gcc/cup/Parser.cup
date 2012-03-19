@@ -4,17 +4,12 @@ import java_cup.runtime.*;
 import java.io.*;
 import java.util.*;
 
-
-action code {:
-  public CodeGenerator cg = new CodeGenerator();
-
-:}
-
 parser code {:
 
   public static Parser p;
   public static PrintStream ps;
   public static int currentReg = 0;
+  public CodeGenerator cg = new CodeGenerator();
 
   Parser(Scanner s, SymbolFactory sf, PrintStream ps){
     super(s,sf);
@@ -34,10 +29,11 @@ parser code {:
     p = new Parser(new Scanner(new FileInputStream(args[0]),sf),
                                sf,
                                new PrintStream(destination_file));
-    p.ps.println("\t.file \""+ args[0]+"\"");
-    System.out.println("modified version");
+    //System.out.println("modified version");
     //p.debug_parse();
     p.parse();
+    p.ps.println("\t.file \""+ args[0]+"\"");
+    //p.ps.println(cg.generateCode());
     p.ps.close();
   }
   
@@ -95,7 +91,11 @@ dec_func_list ::=
     STATIC type IDENT arr SEMI dec_func_list
     
     // Format for the declaration of a non-static variable, or a prototype
-  | type IDENT dec_end 
+  | type:t IDENT:id
+           {:
+             parser.cg.pushInformation(t);
+             parser.cg.pushInformation(id);
+           :}dec_end
   
     // Format for the prototype of a function with void return type
   | VOID IDENT proto_func
@@ -113,7 +113,7 @@ arr ::=
     // Therefore it wile be of the for [NUM]
     LHOOK NB_INT RHOOK
     // It may also be empty
-  |							 				
+  |                     
   ;
    
 // Beginning of the parameters of a function's prototype
@@ -127,10 +127,10 @@ hybrid_param ::=
     // A list of types ending with a semicolon, another declaration or
     // a function may follow
     types_list:typeList RPAREN SEMI
-                      {:
-                        cg.pushInformation((ArrayList<Type>)typeList);
-                        cg.declareFunction();
-                      :} dec_func_list
+                               {:
+                                 parser.cg.pushInformation((ArrayList<Type>)typeList);
+                                 parser.cg.declarePrototype();
+                               :} dec_func_list
     
     // List of the arguments for a function.
     // a function ends with a }
@@ -193,7 +193,7 @@ prototype ::=
 
 
 type ::=
-    INT
+    INT {:RESULT = Type.INT;:}
   ;
     
 // A sequence of types for the prototype of a function
