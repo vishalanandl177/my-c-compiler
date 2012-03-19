@@ -13,7 +13,8 @@ action code {:
 parser code {:
 
   public static Parser p;
-  public PrintStream ps;
+  public static PrintStream ps;
+  public static int currentReg = 0;
 
   Parser(Scanner s, SymbolFactory sf, PrintStream ps){
     super(s,sf);
@@ -40,6 +41,13 @@ parser code {:
     p.ps.close();
   }
   
+
+  public static String getNextRegistry(){	      
+  	  String s = new String("R" + currentReg);
+	  currentReg++;
+	  return s;	
+  }
+
   public void syntax_error(Symbol cur_token) { //overloads the default method
     report_error("*** Syntax Error at line "
                  + (cur_token.left+1)
@@ -63,9 +71,12 @@ terminal Integer NB_INT;
 non terminal program, declarations_list, declaration, prototype, type,
              types_sequence, types_list, functions_list, function, header,
              param_sequence, param_list, parameter, body, instruct_list,
-             instruction, expression, arg_sequence, args_list, bin_op,
+             instruction, arg_sequence, args_list,
              dec_func_list, dec_end, proto_func, hybrid_param, dec_or_func_end,
              arr, arr_proto;
+
+non terminal String bin_op;
+non terminal ArithmeticResult expression;
 
 
 precedence left OR, AND;
@@ -261,7 +272,7 @@ instruct_list ::=
 instruction ::=
     
     // Compare the value of a variable with that of an expression
-    IDENT EQL expression
+    IDENT EQL expression:e {: cg.generateArithmeticResult(e, Parser.ps); :}
     
     // Compare the value of an item from an array with that of an expression
     // The index may be obtained with an expression
@@ -291,17 +302,42 @@ instruction ::=
     // Allow for the use of multiple instructions (for instance
     // after an if, or a while
   | LBRACKET instruct_list RBRACKET
+  
   | expression
   ;
         
 // Defines the list of possible expressions to be used
 expression ::=
-    expression bin_op expression
+    expression:l bin_op:b expression:r
+
+    //{: System.out.println(b + l.toString() + ", " + r.toString());
+    //   RESULT = new String(l.toString()); :}
+
+    {: RESULT = new ArithmeticResult(l.getValue(), b, r.getValue(), l.getValue()); :}
+
   | MINUS expression
   | NOT expression
-  | LPAREN expression RPAREN
-  | IDENT
-  | NB_INT
+  | LPAREN expression:e RPAREN
+    {: RESULT = new ArithmeticResult(null, null, null, e.getValue()); :}
+
+  | IDENT:i
+    //{: String s = Parser.getNextRegistry();
+    //   System.out.println("  load " + i.toString() + ", " + s);
+    //   RESULT = new String(s); :}
+
+    {: String s = Parser.getNextRegistry();
+       RESULT = new ArithmeticResult(null, null, null, s);
+       cg.generateArithmeticLoad(i.toString(), s, Parser.ps); :}
+
+  | NB_INT:n
+    //{: String s = Parser.getNextRegistry();      
+    //   System.out.println("  load " + n.toString() + ", " + s);
+    //   RESULT = new String(s); :}
+
+    {: String s = Parser.getNextRegistry();
+       RESULT = new ArithmeticResult(null, null, null, s);
+       cg.generateArithmeticLoad(n.toString(), s, Parser.ps); :}
+
   
     // Allows the use of a function in an expression
   | IDENT LPAREN arg_sequence RPAREN
@@ -332,9 +368,13 @@ bin_op ::=
   | GEQL
   | DIFF
   | PLUS
+    {: RESULT = new String("  add "); :}
   | MINUS
+    {: RESULT = new String("  sub "); :}
   | TIMES
+    {: RESULT = new String("  mul "); :}
   | DIV
+    {: RESULT = new String("  div "); :}
   | MOD
   | OR
   | AND
