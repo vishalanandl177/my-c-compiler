@@ -1,4 +1,4 @@
-package MYGCC;
+package MyGCC;
 
 import java.util.*;
 
@@ -9,7 +9,7 @@ public class Block {
   
   public Block() {
     this.declarations = new ArrayList<Declaration>();
-    this.identifier = new ArrayList<Instruction>();
+    this.instructions = new ArrayList<Instruction>();
   }
   
   public Block(ArrayList<Declaration> dec, ArrayList<Instruction> ins) {

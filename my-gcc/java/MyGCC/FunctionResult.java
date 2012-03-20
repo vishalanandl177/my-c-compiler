@@ -1,20 +1,26 @@
-package MYGCC;
+package MyGCC;
+
+import java.util.Map.Entry;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 
 public class FunctionResult extends ParsingResult {
   
   public Type retType;
   public String identifier;
-  public Tuple arguments;
+  public ArrayList<Entry<Type,String>> arguments = new ArrayList<Entry<Type,String>>();
   public Block body;
   
   public FunctionResult() {
-    this.retType = new Type();
+    // shouldn't be used
+    super(ResultType.FUNCTION);
+    this.retType = null;
     this.identifier = new String();
-    this.arguments = new Tuple();
     this.body = new Block();
   }
   
-  public FunctionResult(Type t, String id, Tuple args, Block b) {
+  public FunctionResult(Type t, String id, ArrayList<Entry<Type,String>>  args, Block b) {
+    super(ResultType.FUNCTION);
     this.retType = t;
     this.identifier = id;
     this.arguments = args;
@@ -29,7 +35,7 @@ public class FunctionResult extends ParsingResult {
     return this.identifier;
   }
   
-  public Tuple getArguments() {
+  public ArrayList<Entry<Type,String>> getArguments() {
     return this.arguments;
   }
   
@@ -45,7 +51,7 @@ public class FunctionResult extends ParsingResult {
     this.identifier = id;
   }
   
-  public void setArguments(Tuple args) {
+  public void setArguments(ArrayList<Entry<Type,String>> args) {
     this.arguments = args;
   }
 

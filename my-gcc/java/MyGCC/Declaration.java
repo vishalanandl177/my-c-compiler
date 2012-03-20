@@ -1,4 +1,4 @@
-package MYGCC;
+package MyGCC;
 
 public class Declaration {
   //TODO
