@@ -1,5 +1,7 @@
 package MyGCC;
 
+import java.util.LinkedList;
+
 public class PrototypeResult extends ParsingResult{
   
   public Type retType;
@@ -7,14 +9,16 @@ public class PrototypeResult extends ParsingResult{
   public LinkedList<Type> typeList;
   
   public PrototypeResult() {
-    this.retType = new Type();
+    super(ResultType.PROTOTYPE);
+    this.retType = null;
     this.identifier = new String();
     this.typeList = new LinkedList<Type>();
   }
   
   public PrototypeResult(Type t, String ident, LinkedList<Type> llt) {
+    super(ResultType.PROTOTYPE);
     this.retType = t;
-    this.identifier = s;
+    this.identifier = ident;
     this.typeList = llt;
   }
   

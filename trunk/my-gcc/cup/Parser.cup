@@ -33,7 +33,7 @@ parser code {:
     //p.debug_parse();
     p.parse();
     p.ps.println("\t.file \""+ args[0]+"\"");
-    //p.ps.println(cg.generateCode());
+    //p.ps.println(parser.cg.generateCode());
     p.ps.close();
   }
   
@@ -272,7 +272,7 @@ instruct_list ::=
 instruction ::=
     
     // Compare the value of a variable with that of an expression
-    IDENT EQL expression:e {: cg.generateArithmeticResult(e, Parser.ps); :}
+    IDENT EQL expression:e {: parser.cg.generateArithmeticResult(e, Parser.ps); :}
     
     // Compare the value of an item from an array with that of an expression
     // The index may be obtained with an expression
@@ -327,7 +327,7 @@ expression ::=
 
     {: String s = Parser.getNextRegistry();
        RESULT = new ArithmeticResult(null, null, null, s);
-       cg.generateArithmeticLoad(i.toString(), s, Parser.ps); :}
+       parser.cg.generateArithmeticLoad(i.toString(), s, Parser.ps); :}
 
   | NB_INT:n
     //{: String s = Parser.getNextRegistry();      
@@ -336,7 +336,7 @@ expression ::=
 
     {: String s = Parser.getNextRegistry();
        RESULT = new ArithmeticResult(null, null, null, s);
-       cg.generateArithmeticLoad(n.toString(), s, Parser.ps); :}
+       parser.cg.generateArithmeticLoad(n.toString(), s, Parser.ps); :}
 
   
     // Allows the use of a function in an expression
