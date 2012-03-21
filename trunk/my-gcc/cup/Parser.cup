@@ -31,8 +31,8 @@ parser code {:
                                new PrintStream(destination_file));
     //System.out.println("modified version");
     //p.debug_parse();
+    p.ps.println("\t.file \""+ args[0]+"\"\n\t.text\n");
     p.parse();
-    p.ps.println("\t.file \""+ args[0]+"\"");
     //p.ps.println(parser.cg.generateCode());
     p.ps.close();
   }
@@ -167,7 +167,7 @@ declaration ::=
     // A declaration must contain a type (int, float, void, ect...)
     // an identifier (name of the variable of function)
     // and either an array, or the rest of a function's prototype
-    type IDENT arr_proto
+    type IDENT:i arr_proto {: parser.cg.generateTypeLoad(i, Parser.getNextRegistry(), Parser.ps);:}
     
     // A variable may be declared as static
   | STATIC type IDENT arr
@@ -282,10 +282,10 @@ instruction ::=
   | EXIT LPAREN NB_INT RPAREN
   
     // Return the value of an expression
-  | RETURN expression
+  | RETURN expression:e {: parser.cg.generateReturn(e, Parser.ps); :}
   
     // Return no value
-  | RETURN
+  | RETURN {: parser.cg.generateReturn(null, Parser.ps); :}
   
     // 
   | READ_INT LPAREN IDENT RPAREN
@@ -309,34 +309,24 @@ instruction ::=
 // Defines the list of possible expressions to be used
 expression ::=
     expression:l bin_op:b expression:r
-
-    //{: System.out.println(b + l.toString() + ", " + r.toString());
-    //   RESULT = new String(l.toString()); :}
-
-    {: RESULT = new ArithmeticResult(l.getValue(), b, r.getValue(), l.getValue()); :}
+      {: RESULT = new ArithmeticResult(l.getValue(), b, r.getValue(), l.getValue()); :}
 
   | MINUS expression
+  
   | NOT expression
+  
   | LPAREN expression:e RPAREN
-    {: RESULT = new ArithmeticResult(null, null, null, e.getValue()); :}
+      {: RESULT = new ArithmeticResult(null, null, null, e.getValue()); :}
 
   | IDENT:i
-    //{: String s = Parser.getNextRegistry();
-    //   System.out.println("  load " + i.toString() + ", " + s);
-    //   RESULT = new String(s); :}
-
-    {: String s = Parser.getNextRegistry();
-       RESULT = new ArithmeticResult(null, null, null, s);
-       parser.cg.generateArithmeticLoad(i.toString(), s, Parser.ps); :}
+      {: String s = Parser.getNextRegistry();
+         RESULT = new ArithmeticResult(null, null, null, s);
+         parser.cg.generateArithmeticLoad(i.toString(), s, Parser.ps); :}
 
   | NB_INT:n
-    //{: String s = Parser.getNextRegistry();      
-    //   System.out.println("  load " + n.toString() + ", " + s);
-    //   RESULT = new String(s); :}
-
-    {: String s = Parser.getNextRegistry();
-       RESULT = new ArithmeticResult(null, null, null, s);
-       parser.cg.generateArithmeticLoad(n.toString(), s, Parser.ps); :}
+      {: String s = Parser.getNextRegistry();
+         RESULT = new ArithmeticResult(null, null, null, s);
+         parser.cg.generateArithmeticLoad(n.toString(), s, Parser.ps); :}
 
   
     // Allows the use of a function in an expression

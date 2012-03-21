@@ -1,13 +1,19 @@
 package MyGCC;
 
 public enum Type {
-  INT(true),
-  VOID(false);
-  
-  private Type(boolean ia) {
-    this.isVarType = ia;
-  }
+  INT("int", true),
+  VOID("void", false);
   
   private boolean isVarType;
+  private String strType;
+    
+  private Type(String s, boolean ia) {
+    this.isVarType = ia;
+    this.strType = s;
+  }
+  
+  public String toString(){
+    return this.strType;
+  }
     
 }
