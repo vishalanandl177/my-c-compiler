@@ -2,7 +2,10 @@
 ant clean
 ant
 
-COMPILER="java -jar jar/Compiler.jar"
+OUR_COMPILER="java -jar jar/Compiler.jar"
 
-$COMPILER tests/test1.c
+TEST1="tests/test1"
 
+$OUR_COMPILER $TEST1.c
+
+gcc $TEST1.s executor.c

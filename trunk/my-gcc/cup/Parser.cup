@@ -33,15 +33,15 @@ parser code {:
     //p.debug_parse();
     p.ps.println("\t.file \""+ args[0]+"\"\n\t.text\n");
     p.parse();
-    //p.ps.println(parser.cg.generateCode());
+    p.ps.println(p.cg.generateCode());
     p.ps.close();
   }
   
 
-  public static String getNextRegistry(){	      
-  	  String s = new String("R" + currentReg);
-	  currentReg++;
-	  return s;	
+  public static String getNextRegistry(){       
+    String s = new String("R" + currentReg);
+    currentReg++;
+    return s; 
   }
 
   public void syntax_error(Symbol cur_token) { //overloads the default method
@@ -146,11 +146,18 @@ dec_or_func_end ::=
 
     // All declarations end with a semicolon, and may be
     // followed by either a function of a declarion
-    SEMI dec_func_list
+    SEMI
+    {:
+      parser.cg.declarePrototype();
+    :} dec_func_list
     
     // If we have a function, it will be ended by { code }
     // And followed by a list of functions
-  | LBRACKET body RBRACKET functions_list
+  | LBRACKET body:b RBRACKET
+                  {:
+                    parser.cg.pushInformation(b);
+                    parser.cg.declareFunction();
+                  :} functions_list
   ;
 
 // Defines the constraints of a list of declarations

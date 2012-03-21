@@ -7,3 +7,9 @@ int addition(int a,int b){
   c = a+b;
   return c;
 }
+
+int false_main(void){
+  int n;
+  //n = addition(2,3);
+  return n;
+}
