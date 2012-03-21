@@ -2,6 +2,14 @@
 #include "test1.h"
 
 int main(int argc, char ** argv){
-  printf("2 + 3 = %d\n", addition(2,3));
+
+  int a;
+  int b;
+
+  a = 5;
+  b = 9;
+
+  if(a % 5 == 0)
+    b++;
   return 0;
 }

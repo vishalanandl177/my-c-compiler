@@ -40,6 +40,7 @@ SPACING = [ \t\r\f] | {NEWLINE}
   . | {NEWLINE} {}
 }
 
+
 <YYINITIAL>{
 
   \/\/      {yybegin(MONO_COMMENT);}

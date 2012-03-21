@@ -49,11 +49,21 @@ public class CodeGenerator{
   }
 
   public void generateArithmeticResult(ArithmeticResult ar, PrintStream ps){
-	ps.println(ar.getOp() + " " + ar.getLeft() + " " + ar.getRight());
+    ps.println(ar.getOp() + " " + ar.getLeft() + " " + ar.getRight());
   }
 
   
   public void generateArithmeticLoad(String id, String registry, PrintStream ps){
-	ps.println("  load " + id + " " + registry);
+    ps.println("  load " + id + " " + registry);
+  }
+  
+  public void generateTypeLoad(String type, String registry, PrintStream ps){
+    ps.println("  load " + type + " " + registry);
+  }
+  
+  public void generateReturn(ArithmeticResult ar, PrintStream ps){
+    if(ar != null)
+      ps.println("  movl " + ar.getValue() + " %eax");
+    ps.println("  leave\n  ret\n");
   }
 }
