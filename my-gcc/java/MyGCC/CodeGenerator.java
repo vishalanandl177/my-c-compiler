@@ -71,13 +71,13 @@ public class CodeGenerator{
                        + "\nname : " + name);*/
   }
 
-  public void generateArithmeticResult(ArithmeticResult ar, PrintStream ps){
-    ps.println(ar.getOp() + " " + ar.getLeft() + " " + ar.getRight());
+  public void generateArithmeticResult(Expression ar, PrintStream ps){
+    ps.println(ar.op + " " + ar.left.value + ", " + ar.right.value);
   }
 
   
   public void generateArithmeticLoad(String id, String registry, PrintStream ps){
-    ps.println("  load " + id + " " + registry);
+    ps.println("  load " + id + ", " + registry);
   }
 
   public String generateCode(){
@@ -89,12 +89,12 @@ public class CodeGenerator{
   }
   
   public void generateTypeLoad(String type, String registry, PrintStream ps){
-    ps.println("  load " + type + " " + registry);
+    ps.println("  load " + type + ", " + registry);
   }
   
-  public void generateReturn(ArithmeticResult ar, PrintStream ps){
+  public void generateReturn(Expression ar, PrintStream ps){
     if(ar != null)
-      ps.println("  movl " + ar.getValue() + " %eax");
+      ps.println("  movl " + ar.value + ", %eax");
     ps.println("  leave\n  ret\n");
   }
 
