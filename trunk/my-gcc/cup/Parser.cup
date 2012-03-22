@@ -8,7 +8,7 @@ parser code {:
 
   public static Parser p;
   public static PrintStream ps;
-  public static int currentReg = 0;
+  public static char currentReg = 'c';
   public CodeGenerator cg = new CodeGenerator();
 
   Parser(Scanner s, SymbolFactory sf, PrintStream ps){
@@ -39,7 +39,7 @@ parser code {:
   
 
   public static String getNextRegistry(){       
-    String s = new String("R" + currentReg);
+    String s = new String("$e" + currentReg + "x");
     currentReg++;
     return s; 
   }
@@ -72,7 +72,7 @@ non terminal program, declarations_list, declaration, prototype, type,
              arr, arr_proto;
 
 non terminal String bin_op;
-non terminal ArithmeticResult expression;
+non terminal Expression expression;
 
 
 precedence left OR, AND;
@@ -315,29 +315,30 @@ instruction ::=
         
 // Defines the list of possible expressions to be used
 expression ::=
-    expression:l bin_op:b expression:r
-      {: RESULT = new ArithmeticResult(l.getValue(), b, r.getValue(), l.getValue()); :}
+    expression:left bin_op:op expression:right
+      {: RESULT = new ArithmeticResult(left.value, op, left, right); :}
 
   | MINUS expression
   
   | NOT expression
   
   | LPAREN expression:e RPAREN
-      {: RESULT = new ArithmeticResult(null, null, null, e.getValue()); :}
+      {: RESULT = new ArithmeticResult(e.value, null); :}
 
   | IDENT:i
       {: String s = Parser.getNextRegistry();
-         RESULT = new ArithmeticResult(null, null, null, s);
+         RESULT = new ArithmeticResult(s, null);
          parser.cg.generateArithmeticLoad(i.toString(), s, Parser.ps); :}
 
   | NB_INT:n
       {: String s = Parser.getNextRegistry();
-         RESULT = new ArithmeticResult(null, null, null, s);
+         RESULT = new ArithmeticResult(s, null);
          parser.cg.generateArithmeticLoad(n.toString(), s, Parser.ps); :}
 
   
     // Allows the use of a function in an expression
   | IDENT LPAREN arg_sequence RPAREN
+      //{: RESULT = new FunctionResult(); :}
   
     // Allows the use of arrays with expression calculated indexes
   | IDENT LHOOK expression RHOOK
