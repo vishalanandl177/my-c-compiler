@@ -3,6 +3,7 @@ package MyGCC;
 import java_cup.runtime.*;
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 parser code {:
 
@@ -64,13 +65,16 @@ terminal INT, VOID, STATIC, LHOOK, RHOOK, LPAREN, RPAREN, LBRACKET, RBRACKET,
 terminal String IDENT;
 terminal Integer NB_INT;
 
-non terminal program, declarations_list, declaration, prototype, type,
-             types_sequence, types_list, functions_list, function, header,
-             param_sequence, param_list, parameter, body, instruct_list,
+non terminal program, declarations_list, declaration, prototype,
+             functions_list, function, header,
+             parameter, body, instruct_list,
              instruction, arg_sequence, args_list,
              dec_func_list, dec_end, proto_func, hybrid_param, dec_or_func_end,
              arr, arr_proto;
 
+non terminal Type type;
+non terminal ArrayList<Type> types_list, types_sequence;
+non terminal ArrayList<Entry<Type,String>> param_list, param_sequence;
 non terminal String bin_op;
 non terminal Expression expression;
 
@@ -93,8 +97,10 @@ dec_func_list ::=
     // Format for the declaration of a non-static variable, or a prototype
   | type:t IDENT:id
            {:
-             parser.cg.pushInformation(t);
-             parser.cg.pushInformation(id);
+             parser.cg.pushInformation(new ParsingResult<Type>(ResultType.TYPE,
+                                                               t));
+             parser.cg.pushInformation(new ParsingResult<String>(ResultType.ID,
+                                                                 id));
            :}dec_end
   
     // Format for the prototype of a function with void return type
@@ -127,14 +133,25 @@ hybrid_param ::=
     // A list of types ending with a semicolon, another declaration or
     // a function may follow
     types_list:typeList RPAREN SEMI
-                               {:
-                                 parser.cg.pushInformation((ArrayList<Type>)typeList);
-                                 parser.cg.declarePrototype();
-                               :} dec_func_list
+      {:
+        parser.cg.pushInformation(new ParsingResult<ArrayList<Type>>(ResultType.PARAMETERS, typeList));
+        parser.cg.declarePrototype();
+      :}
+    dec_func_list
     
     // List of the arguments for a function.
     // a function ends with a }
-  | param_list RPAREN LBRACKET body RBRACKET functions_list
+  | param_list:p RPAREN LBRACKET
+      {:
+        parser.cg.pushInformation(new ParsingResult<ArrayList<Entry<Type,String>>>(ResultType.PARAMETERS,p));
+        parser.cg.declareFunction();
+        parser.cg.openFunction();
+      :}
+    body RBRACKET
+      {:
+        parser.cg.closeFunction();
+      :}
+    functions_list
   
     // The function may require no parameters, a declaration or function
     // may ensue
@@ -149,7 +166,8 @@ dec_or_func_end ::=
     SEMI
     {:
       parser.cg.declarePrototype();
-    :} dec_func_list
+    :}
+    dec_func_list
     
     // If we have a function, it will be ended by { code }
     // And followed by a list of functions
@@ -174,7 +192,9 @@ declaration ::=
     // A declaration must contain a type (int, float, void, ect...)
     // an identifier (name of the variable of function)
     // and either an array, or the rest of a function's prototype
-    type IDENT:i arr_proto {: parser.cg.generateTypeLoad(i, Parser.getNextRegistry(), Parser.ps);:}
+    type IDENT:id
+         {:parser.cg.pushInformation(new ParsingResult<String>(ResultType.ID, id));:}
+           arr_proto
     
     // A variable may be declared as static
   | STATIC type IDENT arr
@@ -186,8 +206,8 @@ declaration ::=
 // Determines if we are dealing with the declaration of a variable
 // or a prototype and reduces accordingly
 arr_proto ::=
-    arr
-  | prototype
+    arr {:parser.cg.declareVariable(); :}
+  | prototype {:parser.cg.declarePrototype(); :}
   ;
       
 // Definition of the part of a function's prototype that differs from
