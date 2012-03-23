@@ -9,7 +9,7 @@ public class Function{
   private Type returnType;
   private ArrayList<Parameter> parameters = new ArrayList<Parameter>();
   private String name;
-  private Block body;
+  public Block body;  //change class to Body
 
   public Function(String name,
                   Type returnType,

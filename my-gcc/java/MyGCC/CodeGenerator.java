@@ -14,9 +14,14 @@ public class CodeGenerator{
 
   private Context globalContext;
   private Context actualContext;
+  private Function currentFunction;
 
   public CodeGenerator(){
     myStack = new LinkedList<Stack<Object>>();
+  }
+  
+  public void pushInstruction(Instruction i){
+    currentFunction.body.instructions.add(i);
   }
 
   public void pushInformation(Object o){
@@ -69,19 +74,37 @@ public class CodeGenerator{
       }
     }
     globalFunctions.add(new Function(name, returnType, parameters, body));
+    //this.currentFunction = globalFunctions.getLast();
   }
+
 
   public void declareVariable(){
     //TODO
   }
-
-  public void generateArithmeticResult(Expression ar, PrintStream ps){
-    ps.println(ar.op + " " + ar.left.value + ", " + ar.right.value);
-  }
-
   
-  public void generateArithmeticLoad(String id, String registry, PrintStream ps){
-    ps.println("  load " + id + ", " + registry);
+  public void generateInstruction(Instruction i, PrintStream ps){
+    if(i.expr == null)
+      ps.println("  leave\n  ret\n");
+      
+    else{
+      InstructionType t = i.instrType;
+      switch(t){
+        case RETURN:
+          ps.println("  movl " + i.expr.value + ", %eax");
+          ps.println("  leave\n  ret\n");
+          break;
+        case EXIT:
+          //TODO
+          break;
+        case EQL:
+          //TODO
+          break;
+        default:
+          //TODO
+          break;
+      }
+    }
+    
   }
 
   public String generateCode(){
@@ -90,16 +113,6 @@ public class CodeGenerator{
       sb.append(f.toString());
     }
     return sb.toString();
-  }
-  
-  public void generateTypeLoad(String type, String registry, PrintStream ps){
-    ps.println("  load " + type + ", " + registry);
-  }
-  
-  public void generateReturn(Expression ar, PrintStream ps){
-    if(ar != null)
-      ps.println("  movl " + ar.value + ", %eax");
-    ps.println("  leave\n  ret\n");
   }
   
   public void closeFunction(){

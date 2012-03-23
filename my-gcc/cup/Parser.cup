@@ -63,20 +63,20 @@ terminal INT, VOID, STATIC, LHOOK, RHOOK, LPAREN, RPAREN, LBRACKET, RBRACKET,
          OR, AND;
     
 terminal String IDENT;
-terminal Integer NB_INT;
+terminal Expression NB_INT;
 
 non terminal program, declarations_list, declaration, prototype,
              functions_list, function, header,
              parameter, body, instruct_list,
-             instruction, arg_sequence, args_list,
-             dec_func_list, dec_end, proto_func, hybrid_param, dec_or_func_end,
-             arr, arr_proto;
+             arg_sequence, args_list, dec_func_list, dec_end, proto_func,
+             hybrid_param, dec_or_func_end, arr, arr_proto;
 
 non terminal Type type;
 non terminal ArrayList<Type> types_list, types_sequence;
 non terminal ArrayList<Entry<Type,String>> param_list, param_sequence;
 non terminal String bin_op;
 non terminal Expression expression;
+non terminal Instruction instruction;
 
 
 precedence left OR, AND;
@@ -192,8 +192,10 @@ declaration ::=
     // A declaration must contain a type (int, float, void, ect...)
     // an identifier (name of the variable of function)
     // and either an array, or the rest of a function's prototype
+
     type IDENT:id
          {:parser.cg.pushInformation(new ParsingResult<String>(ResultType.ID, id));:}
+         //{: parser.cg.generateTypeLoad(i, Parser.getNextRegistry(), Parser.ps);:}
            arr_proto
     
     // A variable may be declared as static
@@ -284,7 +286,7 @@ parameter ::=
   | INT IDENT LHOOK NB_INT RHOOK
   ;
      
-// The body of a function is composed of declarations and instructions
+// The body of a function is cNB_INTomposed of declarations and instructions
 body ::=
     declarations_list instruct_list
   ;
@@ -299,22 +301,26 @@ instruct_list ::=
 instruction ::=
     
     // Compare the value of a variable with that of an expression
-    IDENT EQL expression:e {: parser.cg.generateArithmeticResult(e, Parser.ps); :}
+    IDENT EQL expression:e
+      {: parser.cg.pushInstruction(new Instruction(e, InstructionType.EQL)); :}
     
     // Compare the value of an item from an array with that of an expression
     // The index may be obtained with an expression
   | IDENT LHOOK expression RHOOK EQL expression
   
     // Exit with status NB_INT
-  | EXIT LPAREN NB_INT RPAREN
+  | EXIT LPAREN NB_INT:n RPAREN
+      {: parser.cg.pushInstruction(new Instruction(n, InstructionType.EXIT)); :}
   
     // Return the value of an expression
-  | RETURN expression:e {: parser.cg.generateReturn(e, Parser.ps); :}
+  | RETURN expression:e
+      {: parser.cg.pushInstruction(new Instruction(e, InstructionType.RETURN)); :}
   
     // Return no value
-  | RETURN {: parser.cg.generateReturn(null, Parser.ps); :}
+  | RETURN 
+      {: parser.cg.pushInstruction(new Instruction(null, InstructionType.RETURN)); :}
   
-    // 
+    // Scanf(int)
   | READ_INT LPAREN IDENT RPAREN
   
     // Basic "if else" test on an expression
@@ -330,7 +336,8 @@ instruction ::=
     // after an if, or a while
   | LBRACKET instruct_list RBRACKET
   
-  | expression
+  | expression:e
+      {: RESULT = new Instruction(e, null); :}
   ;
         
 // Defines the list of possible expressions to be used
@@ -347,13 +354,13 @@ expression ::=
 
   | IDENT:i
       {: String s = Parser.getNextRegistry();
-         RESULT = new ArithmeticResult(s, null);
-         parser.cg.generateArithmeticLoad(i.toString(), s, Parser.ps); :}
+         RESULT = new ArithmeticResult(s, null); :}
+         //parser.cg.generateArithmeticLoad(i.toString(), s, Parser.ps); :}
 
   | NB_INT:n
       {: String s = Parser.getNextRegistry();
-         RESULT = new ArithmeticResult(s, null);
-         parser.cg.generateArithmeticLoad(n.toString(), s, Parser.ps); :}
+         RESULT = new ArithmeticResult(s, null); :}
+         //parser.cg.generateArithmeticLoad(n.toString(), s, Parser.ps); :}
 
   
     // Allows the use of a function in an expression
@@ -386,13 +393,13 @@ bin_op ::=
   | GEQL
   | DIFF
   | PLUS
-    {: RESULT = new String("  add "); :}
+    {: RESULT = new String(OperationType.ADD.toString()); :}
   | MINUS
-    {: RESULT = new String("  sub "); :}
+    {: RESULT = new String(OperationType.SUB.toString()); :}
   | TIMES
-    {: RESULT = new String("  mul "); :}
+    {: RESULT = new String(OperationType.MUL.toString()); :}
   | DIV
-    {: RESULT = new String("  div "); :}
+    {: RESULT = new String(OperationType.DIV.toString()); :}
   | MOD
   | OR
   | AND
