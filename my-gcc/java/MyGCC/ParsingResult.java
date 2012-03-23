@@ -1,10 +1,16 @@
 package MyGCC;
 
-public abstract class ParsingResult{
+public class ParsingResult<T>{
   
-  public ResultType myType;
+  public ResultType type;
+  private T value;
 
-  protected ParsingResult(ResultType t){
-    myType = t;
+  protected ParsingResult(ResultType t,T value){
+    type = t;
+    this.value = value;
+  }
+  
+  public T getValue(){
+    return value;
   }
 }
