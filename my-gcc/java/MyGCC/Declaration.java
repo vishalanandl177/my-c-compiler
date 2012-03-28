@@ -22,6 +22,18 @@ public class Declaration {
   
   public int getArraySize() {
     return this.arraySize;
-  }  
+  }
+  
+  public void setType(Type t) {
+    this.type = t;
+  }
+  
+  public void setIdentifier(String id) {
+    this.identifier = id;
+  }
+  
+  public void setArraySize(int size) {
+    this.arraySize = size;
+  }
   
 }
