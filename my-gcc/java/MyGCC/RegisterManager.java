@@ -22,7 +22,8 @@ public class RegisterManager {
   
   public Register getFreeRegister() {
     HashSet<Register> list = Register.getCallerSaved();
-    Iterator<Register> iter = list.iterator();
+    Iterator<Register
+    iter = list.iterator();
     Register r;
     
     while(iter.hasNext()) {

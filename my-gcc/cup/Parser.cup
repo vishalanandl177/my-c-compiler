@@ -387,11 +387,17 @@ args_list ::=
 // List of accepted binary operators
 bin_op ::=
     LESS
+    {: RESULT = new String(OperationType.LESS.toString()); :}
   | GREATER
+    {: RESULT = new String(OperationType.GREATER.toString()); }
   | EQUALS
+    {: RESULT = new String(OperationType.EQUALS.toString()); }
   | LEQL
+    {: RESULT = new String(OperationType.LEQL.toString()); }
   | GEQL
+    {: RESULT = new String(OperationType.GEQL.toString()); }
   | DIFF
+    {: RESULT = new String(OperationType.DIFF.toString()); }
   | PLUS
     {: RESULT = new String(OperationType.ADD.toString()); :}
   | MINUS
@@ -401,7 +407,10 @@ bin_op ::=
   | DIV
     {: RESULT = new String(OperationType.DIV.toString()); :}
   | MOD
+    {: RESULT = new String(OperationType.MOD.toString()); :}  
   | OR
+    {: RESULT = new String(OperationType.OR.toString()); :}
   | AND
+    {: RESULT = new String(OperationType.AND.toString()); :}
   ;
      

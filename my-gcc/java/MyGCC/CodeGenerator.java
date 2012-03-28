@@ -78,8 +78,21 @@ public class CodeGenerator{
   }
 
 
-  public void declareVariable(){
-    //TODO
+  public void declareVariable() {
+    Type type = null;
+    String identifier = null; 
+    int arraySize = 0;
+    
+    Stack<Object> tmpStack = myStack.getLast();
+    while(!tmpStack.isEmpty()) {
+      ParasingResult r = (ParasingResult) tmpStack.pop();
+      switch(r.type) {
+        case TYPE : type = ((ParsingResult<Type>)r).getValue(); break;
+        case ID : identifier = ((ParsingResult<String>)r).getValue(); break;
+        case ARITHMETIC : arraySize = ((ParsingResult<Int>)r).getValue(); break;
+      }
+    }
+    this.currentFunction.body.block.instructions.add(new Declaration(type, id, arraySize));
   }
   
   public void generateInstruction(Instruction i, PrintStream ps){
