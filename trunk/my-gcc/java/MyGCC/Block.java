@@ -4,8 +4,6 @@ import java.util.*;
 
 public class Block {
   
- public class Block {
-  
   public ArrayList<Instruction> instructions;
   public ArrayList<Block> blocks;
 

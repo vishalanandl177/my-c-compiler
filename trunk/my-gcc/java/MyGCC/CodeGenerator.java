@@ -21,7 +21,7 @@ public class CodeGenerator{
   }
   
   public void pushInstruction(Instruction i){
-    currentFunction.body.instructions.add(i);
+    currentFunction.body.pushInstuctionToBlock(i);
   }
 
   public void pushInformation(Object o){
@@ -57,11 +57,11 @@ public class CodeGenerator{
   }
 
   public void declareFunction(){
-    System.out.println("FUNCTIIIIIIIIIIIIIIION");
+    System.out.println("FUNCTIIIION");
     Type returnType = null;
     String name = null;
     ArrayList<Parameter> parameters = null;
-    Block body = null;
+    Body body = null;
 
     Stack<Object> tmpStack = myStack.getLast();
     while (!tmpStack.isEmpty()){
@@ -70,11 +70,11 @@ public class CodeGenerator{
       case TYPE :   returnType = ((ParsingResult<Type>)r).getValue(); break;
       case ID:          name       = ((ParsingResult<String>)r).getValue();       break;
       case PARAMETERS :   parameters = ((ParsingResult<ArrayList<Parameter>>)r).getValue();       break;
-      case BLOCK:         body       = ((ParsingResult<Block>)r).getValue();       break;
+      case BODY:         body       = ((ParsingResult<Body>)r).getValue();       break;
       }
     }
     globalFunctions.add(new Function(name, returnType, parameters, body));
-    //this.currentFunction = globalFunctions.getLast();
+    this.currentFunction = globalFunctions.getLast();
   }
 
 
@@ -85,14 +85,14 @@ public class CodeGenerator{
     
     Stack<Object> tmpStack = myStack.getLast();
     while(!tmpStack.isEmpty()) {
-      ParasingResult r = (ParasingResult) tmpStack.pop();
+      ParsingResult r = (ParsingResult) tmpStack.pop();
       switch(r.type) {
         case TYPE : type = ((ParsingResult<Type>)r).getValue(); break;
         case ID : identifier = ((ParsingResult<String>)r).getValue(); break;
-        case ARITHMETIC : arraySize = ((ParsingResult<Int>)r).getValue(); break;
+        case ARITHMETIC : arraySize = ((ParsingResult<Integer>)r).getValue(); break;
       }
     }
-    this.currentFunction.body.block.instructions.add(new Declaration(type, id, arraySize));
+    this.currentFunction.body.declarations.add(new Declaration(type, identifier, arraySize));
   }
   
   public void generateInstruction(Instruction i, PrintStream ps){
@@ -103,7 +103,7 @@ public class CodeGenerator{
       InstructionType t = i.instrType;
       switch(t){
         case RETURN:
-          ps.println("  movl " + i.expr.value + ", %eax");
+          //ps.println("  movl " + i.expr.value + ", %eax");
           ps.println("  leave\n  ret\n");
           break;
         case EXIT:

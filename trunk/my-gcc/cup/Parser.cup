@@ -9,8 +9,10 @@ parser code {:
 
   public static Parser p;
   public static PrintStream ps;
+  public static Boolean DEBUG = true;
   public static char currentReg = 'c';
   public CodeGenerator cg = new CodeGenerator();
+  public RegisterManager regMan = new RegisterManager();
 
   Parser(Scanner s, SymbolFactory sf, PrintStream ps){
     super(s,sf);
@@ -63,7 +65,7 @@ terminal INT, VOID, STATIC, LHOOK, RHOOK, LPAREN, RPAREN, LBRACKET, RBRACKET,
          OR, AND;
     
 terminal String IDENT;
-terminal Expression NB_INT;
+terminal Integer NB_INT;
 
 non terminal program, declarations_list, declaration, prototype,
              functions_list, function, header,
@@ -286,7 +288,7 @@ parameter ::=
   | INT IDENT LHOOK NB_INT RHOOK
   ;
      
-// The body of a function is cNB_INTomposed of declarations and instructions
+// The body of a function is composed of declarations and instructions
 body ::=
     declarations_list instruct_list
   ;
@@ -310,7 +312,8 @@ instruction ::=
   
     // Exit with status NB_INT
   | EXIT LPAREN NB_INT:n RPAREN
-      {: parser.cg.pushInstruction(new Instruction(n, InstructionType.EXIT)); :}
+      //{: parser.cg.pushInstruction(new Instruction(n, InstructionType.EXIT)); :}
+      //TODO fix: constructor takes Expression as 1st argument, not Integer.
   
     // Return the value of an expression
   | RETURN expression:e
@@ -343,26 +346,23 @@ instruction ::=
 // Defines the list of possible expressions to be used
 expression ::=
     expression:left bin_op:op expression:right
-      {: RESULT = new ArithmeticResult(left.value, op, left, right); :}
+      {: RESULT = new ArithmeticResult<Expression>(op, left, right); :}
 
   | MINUS expression
   
   | NOT expression
   
   | LPAREN expression:e RPAREN
-      {: RESULT = new ArithmeticResult(e.value, null); :}
+      {: RESULT = e; :}
 
   | IDENT:i
-      {: String s = Parser.getNextRegistry();
-         RESULT = new ArithmeticResult(s, null); :}
-         //parser.cg.generateArithmeticLoad(i.toString(), s, Parser.ps); :}
+      {: if(Parser.DEBUG) System.out.println("expression: " + i + "\n");
+      RESULT = new ArithmeticResult<String>(null, i); :}
 
   | NB_INT:n
-      {: String s = Parser.getNextRegistry();
-         RESULT = new ArithmeticResult(s, null); :}
-         //parser.cg.generateArithmeticLoad(n.toString(), s, Parser.ps); :}
+      {: if(Parser.DEBUG) System.out.println("expression: " + n + "\n");
+      RESULT = new ArithmeticResult<Integer>(null, n); :}
 
-  
     // Allows the use of a function in an expression
   | IDENT LPAREN arg_sequence RPAREN
       //{: RESULT = new FunctionResult(); :}
@@ -389,15 +389,15 @@ bin_op ::=
     LESS
     {: RESULT = new String(OperationType.LESS.toString()); :}
   | GREATER
-    {: RESULT = new String(OperationType.GREATER.toString()); }
+    {: RESULT = new String(OperationType.GREATER.toString()); :}
   | EQUALS
-    {: RESULT = new String(OperationType.EQUALS.toString()); }
+    {: RESULT = new String(OperationType.EQUALS.toString()); :}
   | LEQL
-    {: RESULT = new String(OperationType.LEQL.toString()); }
+    {: RESULT = new String(OperationType.LEQL.toString()); :}
   | GEQL
-    {: RESULT = new String(OperationType.GEQL.toString()); }
+    {: RESULT = new String(OperationType.GEQL.toString()); :}
   | DIFF
-    {: RESULT = new String(OperationType.DIFF.toString()); }
+    {: RESULT = new String(OperationType.DIFF.toString()); :}
   | PLUS
     {: RESULT = new String(OperationType.ADD.toString()); :}
   | MINUS
