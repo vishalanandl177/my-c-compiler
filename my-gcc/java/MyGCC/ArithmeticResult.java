@@ -1,20 +1,24 @@
 package MyGCC;
 
-public class ArithmeticResult extends Expression{
+public class ArithmeticResult<T> extends Expression{
+  
+  private T value;
 
-
-    public ArithmeticResult(String value, String op){
+  public ArithmeticResult(String op, T value){
       super();
       this.op = op;
       this.value = value;
     }
     
-    public ArithmeticResult(String value, String op, Expression l, Expression r){
+    public ArithmeticResult(String op, Expression l, Expression r){
       super();
       this.op = op;
-      this.value = value;
       this.left = l;
       this.right = r;
     }
+    
+  public T getValue(){
+    return value;
+  }
 
 }

@@ -4,7 +4,6 @@ public abstract class Expression{
   
     public Expression left;
     public Expression right;
-    public String value;    //Registry
     public String op;
     
     public Expression(){

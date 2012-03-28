@@ -22,7 +22,7 @@ public class RegisterManager {
   
   public Register getFreeRegister() {
     HashSet<Register> list = Register.getCallerSaved();
-    Iterator<Register
+    Iterator<Register> iter;
     iter = list.iterator();
     Register r;
     
