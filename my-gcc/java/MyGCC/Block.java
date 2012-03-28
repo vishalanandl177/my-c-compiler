@@ -4,41 +4,30 @@ import java.util.*;
 
 public class Block {
   
-  public ArrayList<Declaration> declarations;
-  public ArrayList<Expression> expressions;
+ public class Block {
+  
+  public ArrayList<Instruction> instructions;
   public ArrayList<Block> blocks;
-  //in
+
   
   public Block() {
-    this.declarations = new ArrayList<Declaration>();
-    this.expressions = new ArrayList<Expression>();
+    this.instructions = new ArrayList<Instruction>();
     this.blocks = new ArrayList<Block>();
   }
   
-  public Block(ArrayList<Declaration> dec, ArrayList<Expression> ins, ArrayList<Block> bl) {
-    this.declarations = dec;
-    this.expressions = ins;
+  public Block(ArrayList<Instruction> ins, ArrayList<Block> bl) {
+    this.instructions = ins;
     this.blocks = bl;
   }
   
-  public void pushDeclaration(Declaration d) {
-    if(this.declarations != null)
-      if(d != null)
-        this.declarations.add(d);
-      else
-        System.err.println("Object " + d.toString() + " is null");
-    else
-      System.err.println("this.declarations: " + this.declarations + " is null");
-  }
-  
-  public void pushExpression(Expression e) {
-    if(this.expressions != null)
+  public void pushInstruction(Instruction e) {
+    if(this.instructions != null)
       if(e != null)
-        this.expressions.add(e);
+        this.instructions.add(e);
       else
         System.err.println("Object " + e.toString() + " is null");
     else
-      System.err.println("this.expressions: " + this.expressions + " is null");
+      System.err.println("this.Instructions: " + this.instructions + " is null");
   }
   
   public void pushBlock(Block bl) {
@@ -50,13 +39,9 @@ public class Block {
     else
       System.err.println("this.blocks: " + this.blocks + " is null");
   }
-  
-  public ArrayList<Declaration> getDeclarations() {
-    return this.declarations;
-  }
 
-  public ArrayList<Expression> getExpressions() {
-    return this.expressions;
+  public ArrayList<Instruction> getInstructions() {
+    return this.instructions;
   }
   
   public ArrayList<Block> getBlocks() {

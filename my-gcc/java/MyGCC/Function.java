@@ -9,12 +9,12 @@ public class Function{
   private Type returnType;
   private ArrayList<Parameter> parameters = new ArrayList<Parameter>();
   private String name;
-  public Block body;  //change class to Body
+  public Body body;
 
   public Function(String name,
                   Type returnType,
                   ArrayList<Parameter> parameters,
-                  Block body){
+                  Body body){
     this.name = name;
     this.returnType = returnType;
     this.parameters = parameters;
@@ -40,7 +40,7 @@ public class Function{
     return this.arguments;
   }
   
-  public Block getBlock() {
+  public Body getBody() {
     return this.body;
   }
   
