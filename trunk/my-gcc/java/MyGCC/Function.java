@@ -8,7 +8,7 @@ public class Function{
   
   private Type returnType;
   private ArrayList<Parameter> parameters = new ArrayList<Parameter>();
-  private String name;
+  public String name;
   public Body body;
 
   public Function(String name,

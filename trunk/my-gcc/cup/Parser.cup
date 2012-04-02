@@ -196,8 +196,7 @@ declaration ::=
     // and either an array, or the rest of a function's prototype
 
     type IDENT:id
-         {:parser.cg.pushInformation(new ParsingResult<String>(ResultType.ID, id));:}
-         //{: parser.cg.generateTypeLoad(i, Parser.getNextRegistry(), Parser.ps);:}
+         {: parser.cg.pushInformation(new ParsingResult<String>(ResultType.ID, id)); :}
            arr_proto
     
     // A variable may be declared as static
@@ -210,8 +209,8 @@ declaration ::=
 // Determines if we are dealing with the declaration of a variable
 // or a prototype and reduces accordingly
 arr_proto ::=
-    arr {:parser.cg.declareVariable(); :}
-  | prototype {:parser.cg.declarePrototype(); :}
+    arr {: parser.cg.declareVariable(); :}
+  | prototype {: parser.cg.declarePrototype(); :}
   ;
       
 // Definition of the part of a function's prototype that differs from
@@ -295,7 +294,9 @@ body ::=
 
 // A list of instructions, each separated by semicolons
 instruct_list ::=
-    instruction SEMI instruct_list
+    instruction:i 
+      {: parser.cg.handleInstruction(); :}
+    SEMI instruct_list
   |
   ;
         
@@ -304,7 +305,8 @@ instruction ::=
     
     // Compare the value of a variable with that of an expression
     IDENT EQL expression:e
-      {: parser.cg.pushInstruction(new Instruction(e, InstructionType.EQL)); :}
+      {: if(Parser.DEBUG) System.out.println("instruction detected: EQL"); //TODO check state of expression
+         parser.cg.pushInstruction(new Instruction(e, InstructionType.EQL)); :}
     
     // Compare the value of an item from an array with that of an expression
     // The index may be obtained with an expression
@@ -317,11 +319,13 @@ instruction ::=
   
     // Return the value of an expression
   | RETURN expression:e
-      {: parser.cg.pushInstruction(new Instruction(e, InstructionType.RETURN)); :}
+      {: if(Parser.DEBUG) System.out.println("instruction detected: RETURN exp");
+         parser.cg.pushInstruction(new Instruction(e, InstructionType.RETURN)); :}
   
     // Return no value
   | RETURN 
-      {: parser.cg.pushInstruction(new Instruction(null, InstructionType.RETURN)); :}
+      {: if(Parser.DEBUG) System.out.println("instruction detected: RETURN");
+         parser.cg.pushInstruction(new Instruction(null, InstructionType.RETURN)); :}
   
     // Scanf(int)
   | READ_INT LPAREN IDENT RPAREN
@@ -340,13 +344,15 @@ instruction ::=
   | LBRACKET instruct_list RBRACKET
   
   | expression:e
-      {: RESULT = new Instruction(e, null); :}
+      {: if(Parser.DEBUG) System.out.println("instruction detected: exp");
+         parser.cg.pushInstruction(new Instruction(e, null)); :} //OperationType instead of null?
   ;
         
 // Defines the list of possible expressions to be used
 expression ::=
     expression:left bin_op:op expression:right
-      {: RESULT = new ArithmeticResult<Expression>(op, left, right); :}
+      {: if(Parser.DEBUG) System.out.println("expression: " + op);
+         RESULT = new ArithmeticResult<Expression>(op, left, right); :}
 
   | MINUS expression
   
@@ -356,12 +362,12 @@ expression ::=
       {: RESULT = e; :}
 
   | IDENT:i
-      {: if(Parser.DEBUG) System.out.println("expression: " + i + "\n");
-      RESULT = new ArithmeticResult<String>(null, i); :}
+      {: if(Parser.DEBUG) System.out.println("expression: " + i);
+         RESULT = new ArithmeticResult<String>(null, i);  :}
 
   | NB_INT:n
-      {: if(Parser.DEBUG) System.out.println("expression: " + n + "\n");
-      RESULT = new ArithmeticResult<Integer>(null, n); :}
+      {: if(Parser.DEBUG) System.out.println("expression: " + n);
+         RESULT = new ArithmeticResult<Integer>(null, n); :}
 
     // Allows the use of a function in an expression
   | IDENT LPAREN arg_sequence RPAREN
