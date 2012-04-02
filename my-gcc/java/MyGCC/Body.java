@@ -5,7 +5,6 @@ import java.util.*;
 public class Body {
   
   public ArrayList<Declaration> declarations;
-  //public ArrayList<Instruction> instructions;
   public Block block;
   
   public Body() {

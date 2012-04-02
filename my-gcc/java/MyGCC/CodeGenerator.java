@@ -57,7 +57,7 @@ public class CodeGenerator{
   }
 
   public void declareFunction(){
-    System.out.println("FUNCTIIIION");
+    System.out.println("FUNCTIION");
     Type returnType = null;
     String name = null;
     ArrayList<Parameter> parameters = null;
@@ -73,13 +73,14 @@ public class CodeGenerator{
       case BODY:         body       = ((ParsingResult<Body>)r).getValue();       break;
       }
     }
-    globalFunctions.add(new Function(name, returnType, parameters, body));
-    this.currentFunction = globalFunctions.getLast();
+    Function f = new Function(name, returnType, parameters, body);
+    globalFunctions.add(f);
+    this.currentFunction = f;
   }
 
 
   public void declareVariable() {
-    Type type = null;
+    /*Type type = null;
     String identifier = null; 
     int arraySize = 0;
     
@@ -92,33 +93,40 @@ public class CodeGenerator{
         case ARITHMETIC : arraySize = ((ParsingResult<Integer>)r).getValue(); break;
       }
     }
-    this.currentFunction.body.declarations.add(new Declaration(type, identifier, arraySize));
+    if(currentFunction != null)
+      this.currentFunction.body.declarations.add(new Declaration(type, identifier, arraySize));*/
   }
   
-  public void generateInstruction(Instruction i, PrintStream ps){
-    if(i.expr == null)
-      ps.println("  leave\n  ret\n");
+  public void handleInstruction(){
+    StringBuffer sb = new StringBuffer();
+    Stack<Object> tmpStack = myStack.getLast();
+    while(!tmpStack.isEmpty()){
+      Instruction instr = (Instruction) tmpStack.pop();
       
-    else{
-      InstructionType t = i.instrType;
-      switch(t){
+      if(instr.expr == null)
+        sb.append("\tleave\n\tret\n");
+      
+      switch(instr.instrType){
         case RETURN:
-          //ps.println("  movl " + i.expr.value + ", %eax");
-          ps.println("  leave\n  ret\n");
+          sb.append("\tmovl " /*+ instr.expr.value*/ + ", %eax").append("\tleave\n\tret\n");
           break;
         case EXIT:
           //TODO
-          break;
+          break;  
         case EQL:
           //TODO
           break;
         default:
-          //TODO
+          // case null, ie. for instructions like "1+2;"
+          // optimize and don't calculate?
           break;
       }
+      
+      instr.str = sb.toString();
+      System.out.println("myInstruct: " + instr.str + "in: " + this.currentFunction.name);
+      this.currentFunction.body.pushInstuctionToBlock(instr);
     }
-    
-  }
+}
 
   public String generateCode(){
     StringBuffer sb = new StringBuffer();
