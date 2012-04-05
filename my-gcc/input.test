@@ -1,6 +1,9 @@
-int b;
+int main(int);
 
 int main(int a){
+int b;
+int c;
+int d;
 
   a =  3 * 5;
   b = 4 + 2;
