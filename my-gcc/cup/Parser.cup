@@ -100,12 +100,10 @@ dec_func_list ::=
   | type:t IDENT:id
            {:
              if(Parser.DEBUG) System.out.println("Type : " + t);
-             parser.cg.pushInformation(new ParsingResult<Type>(ResultType.TYPE,
-                                                               t));
+             parser.cg.pushInformation(new ParsingResult<Type>(ResultType.TYPE, t));
              if(Parser.DEBUG) System.out.println("Identifier : " + id);
-             parser.cg.pushInformation(new ParsingResult<String>(ResultType.ID,
-                                                                 id));
-           :}dec_end
+             parser.cg.pushInformation(new ParsingResult<String>(ResultType.ID, id));
+           :} dec_end
   
     // Format for the prototype of a function with void return type
   | VOID IDENT proto_func
@@ -151,7 +149,7 @@ hybrid_param ::=
         if(Parser.DEBUG) System.out.println("Push ParamList : " + p);
         parser.cg.pushInformation(new ParsingResult<ArrayList<Entry<Type,String>>>(ResultType.PARAMETERS,p));
         parser.cg.declareFunction();
-        parser.cg.openFunction();
+        parser.cg.openNewFunction();
       :}
     body RBRACKET
       {:
@@ -177,12 +175,10 @@ dec_or_func_end ::=
     
     // If we have a function, it will be ended by { code }
     // And followed by a list of functions
-  | LBRACKET body:b RBRACKET
-                  {:
-                    if(Parser.DEBUG) System.out.println("Push body : " + b);
-                    parser.cg.pushInformation(b);
-                    parser.cg.declareFunction();
-                  :} functions_list
+  | LBRACKET body:b RBRACKET {: if(Parser.DEBUG) System.out.println("Push body : " + b);
+                                parser.cg.pushInformation(b);
+                                parser.cg.declareFunction();
+                             :} functions_list
   ;
 
 // Defines the constraints of a list of declarations
@@ -304,9 +300,9 @@ body ::=
 
 // A list of instructions, each separated by semicolons
 instruct_list ::=
-    instruction:i 
-      {: parser.cg.handleInstruction(); :}
-    SEMI instruct_list
+    instruction:i SEMI
+                      {: parser.cg.handleInstruction(); :}
+                       instruct_list
   |
   ;
         

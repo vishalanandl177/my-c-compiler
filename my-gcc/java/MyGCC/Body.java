@@ -4,17 +4,17 @@ import java.util.*;
 
 public class Body {
   
-  public ArrayList<Declaration> declarations;
-  public Block block;
+  public LinkedList<Declaration> declarations;
+  public Block mainBlock;
   
   public Body() {
-    this.declarations = new ArrayList<Declaration>();
-    this.block = new Block();
+    this.declarations = new LinkedList<Declaration>();
+    this.mainBlock = new Block();
   }
   
-  public Body(ArrayList<Declaration> dec, Block b) {
+  public Body(LinkedList<Declaration> dec, Block b) {
     this.declarations = dec;
-    this.block = b;
+    this.mainBlock = b;
   }
   
   public void pushDeclaration(Declaration d) {
@@ -27,25 +27,27 @@ public class Body {
       System.err.println("this.declarations: " + this.declarations + " is null");
   }
   
-  public void pushInstuctionToBlock(Instruction i) {
-    if(this.block != null)
-      if(i != null)
-        this.block.instructions.add(i);
+  public void pushInstructionToBlock(Instruction i) {
+    if(this.mainBlock != null)
+      if(i != null){
+        this.mainBlock.instructions.add(i);
+        System.out.println("instruction added to block");
+      }
       else
         System.err.println("Object " + i.toString() + " is null");
     else
-      System.err.println("this.block: " + this.block + " is null");
+      System.err.println("this.mainBlock: " + this.mainBlock + " is null");
   }
   
   public void addBlock(){
     //TODO
   }
   
-  public ArrayList<Declaration> getDeclarations() {
+  public LinkedList<Declaration> getDeclarations() {
     return this.declarations;
   }
 
-  public Block getBlock() {
-    return this.block;
+  public Block getMainBlock() {
+    return this.mainBlock;
   }
 }

@@ -4,16 +4,16 @@ import java.util.*;
 
 public class Block {
   
-  public ArrayList<Instruction> instructions;
-  public ArrayList<Block> blocks;
+  public LinkedList<Instruction> instructions;
+  public LinkedList<Block> blocks;
 
   
   public Block() {
-    this.instructions = new ArrayList<Instruction>();
-    this.blocks = new ArrayList<Block>();
+    this.instructions = new LinkedList<Instruction>();
+    this.blocks = new LinkedList<Block>();
   }
   
-  public Block(ArrayList<Instruction> ins, ArrayList<Block> bl) {
+  public Block(LinkedList<Instruction> ins, LinkedList<Block> bl) {
     this.instructions = ins;
     this.blocks = bl;
   }
@@ -38,11 +38,11 @@ public class Block {
       System.err.println("this.blocks: " + this.blocks + " is null");
   }
 
-  public ArrayList<Instruction> getInstructions() {
+  public LinkedList<Instruction> getInstructions() {
     return this.instructions;
   }
   
-  public ArrayList<Block> getBlocks() {
+  public LinkedList<Block> getBlocks() {
     return this.blocks;
   }
 }

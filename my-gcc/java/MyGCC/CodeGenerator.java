@@ -21,7 +21,11 @@ public class CodeGenerator{
   }
   
   public void pushInstruction(Instruction i){
-    currentFunction.body.pushInstuctionToBlock(i);
+    System.out.println("pushing instruction to function: " + currentFunction.name);
+    if(currentFunction == null)
+      System.err.println("ERROR: currentFunction is null");
+      
+    currentFunction.body.pushInstructionToBlock(i);
   }
 
   public void pushInformation(Object o){
@@ -61,16 +65,16 @@ public class CodeGenerator{
     Type returnType = null;
     String name = null;
     ArrayList<Parameter> parameters = null;
-    Body body = null;
-
+    Body body = null; //TODO change to new Body() ?
     Stack<Object> tmpStack = myStack.getLast();
+    
     while (!tmpStack.isEmpty()){
       ParsingResult r = (ParsingResult) tmpStack.pop();
       switch (r.type){
-      case TYPE :   returnType = ((ParsingResult<Type>)r).getValue(); break;
-      case ID:          name       = ((ParsingResult<String>)r).getValue();       break;
-      case PARAMETERS :   parameters = ((ParsingResult<ArrayList<Parameter>>)r).getValue();       break;
-      case BODY:         body       = ((ParsingResult<Body>)r).getValue();       break;
+        case TYPE :   returnType = ((ParsingResult<Type>)r).getValue(); break;
+        case ID:          name       = ((ParsingResult<String>)r).getValue();       break;
+        case PARAMETERS :   parameters = ((ParsingResult<ArrayList<Parameter>>)r).getValue();       break;
+        case BODY:         body       = ((ParsingResult<Body>)r).getValue();       break;
       }
     }
     Function f = new Function(name, returnType, parameters, body);
@@ -107,9 +111,8 @@ public class CodeGenerator{
   
   public void handleInstruction(){
     StringBuffer sb = new StringBuffer();
-    Stack<Object> tmpStack = myStack.getLast();
-    while(!tmpStack.isEmpty()){
-      Instruction instr = (Instruction) tmpStack.pop();
+    Instruction instr = currentFunction.body.mainBlock.instructions.getLast();
+    if(instr != null){
       
       if(instr.expr == null)
         sb.append("\tleave\n\tret\n");
@@ -122,7 +125,7 @@ public class CodeGenerator{
           //TODO
           break;  
         case EQL:
-          //TODO
+          sb.append("test EQL");
           break;
         default:
           // case null, ie. for instructions like "1+2;"
@@ -131,8 +134,11 @@ public class CodeGenerator{
       }
       
       instr.str = sb.toString();
-      System.out.println("myInstruct: " + instr.str + "in: " + this.currentFunction.name);
-      this.currentFunction.body.pushInstuctionToBlock(instr);
+      System.out.println("myInstruct: " + instr.str + ", in function: " + this.currentFunction.name);
+      this.currentFunction.body.pushInstructionToBlock(instr);
+    }
+    else{
+      System.err.println("ERROR: instruction is null");
     }
 }
 
@@ -148,7 +154,7 @@ public class CodeGenerator{
     //TODO
   }
   
-  public void openFunction(){
+  public void openNewFunction(){
     currentFunction = new Function(null, null, null, new Body());
   }
 
