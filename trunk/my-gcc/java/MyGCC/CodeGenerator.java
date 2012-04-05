@@ -80,21 +80,29 @@ public class CodeGenerator{
 
 
   public void declareVariable() {
-    /*Type type = null;
+    Type type = null;
     String identifier = null; 
     int arraySize = 0;
-    
     Stack<Object> tmpStack = myStack.getLast();
     while(!tmpStack.isEmpty()) {
       ParsingResult r = (ParsingResult) tmpStack.pop();
       switch(r.type) {
-        case TYPE : type = ((ParsingResult<Type>)r).getValue(); break;
-        case ID : identifier = ((ParsingResult<String>)r).getValue(); break;
-        case ARITHMETIC : arraySize = ((ParsingResult<Integer>)r).getValue(); break;
+        case TYPE : 
+          type = ((ParsingResult<Type>)r).getValue();
+          break;
+        case ID : 
+          identifier = ((ParsingResult<String>)r).getValue();
+          break;
+        case ARITHMETIC :
+          arraySize = ((ParsingResult<Integer>)r).getValue();
+          break;
+        default:
+          System.err.println("WTF DUDE ?!, I don't know that type was even possible");
       }
     }
-    if(currentFunction != null)
-      this.currentFunction.body.declarations.add(new Declaration(type, identifier, arraySize));*/
+    if(currentFunction != null) {
+      this.currentFunction.body.declarations.add(new Declaration(type, identifier, arraySize));
+    }
   }
   
   public void handleInstruction(){
@@ -141,7 +149,7 @@ public class CodeGenerator{
   }
   
   public void openFunction(){
-    //TODO
+    currentFunction = new Function(null, null, null, new Body());
   }
 
 }

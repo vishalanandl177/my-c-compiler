@@ -99,8 +99,10 @@ dec_func_list ::=
     // Format for the declaration of a non-static variable, or a prototype
   | type:t IDENT:id
            {:
+             if(Parser.DEBUG) System.out.println("Type : " + t);
              parser.cg.pushInformation(new ParsingResult<Type>(ResultType.TYPE,
                                                                t));
+             if(Parser.DEBUG) System.out.println("Identifier : " + id);
              parser.cg.pushInformation(new ParsingResult<String>(ResultType.ID,
                                                                  id));
            :}dec_end
@@ -136,6 +138,7 @@ hybrid_param ::=
     // a function may follow
     types_list:typeList RPAREN SEMI
       {:
+        if(Parser.DEBUG) System.out.println("Push Type List : " + typeList);
         parser.cg.pushInformation(new ParsingResult<ArrayList<Type>>(ResultType.PARAMETERS, typeList));
         parser.cg.declarePrototype();
       :}
@@ -145,6 +148,7 @@ hybrid_param ::=
     // a function ends with a }
   | param_list:p RPAREN LBRACKET
       {:
+        if(Parser.DEBUG) System.out.println("Push ParamList : " + p);
         parser.cg.pushInformation(new ParsingResult<ArrayList<Entry<Type,String>>>(ResultType.PARAMETERS,p));
         parser.cg.declareFunction();
         parser.cg.openFunction();
@@ -175,6 +179,7 @@ dec_or_func_end ::=
     // And followed by a list of functions
   | LBRACKET body:b RBRACKET
                   {:
+                    if(Parser.DEBUG) System.out.println("Push body : " + b);
                     parser.cg.pushInformation(b);
                     parser.cg.declareFunction();
                   :} functions_list
@@ -195,8 +200,11 @@ declaration ::=
     // an identifier (name of the variable of function)
     // and either an array, or the rest of a function's prototype
 
-    type IDENT:id
-         {: parser.cg.pushInformation(new ParsingResult<String>(ResultType.ID, id)); :}
+    type:t IDENT:id
+         {: if(Parser.DEBUG) System.out.println("Push type : " + t);
+            parser.cg.pushInformation(new ParsingResult<Type>(ResultType.TYPE, t));
+            if(Parser.DEBUG) System.out.println("Push Identifier : " + id);
+            parser.cg.pushInformation(new ParsingResult<String>(ResultType.ID, id)); :}
            arr_proto
     
     // A variable may be declared as static
@@ -223,7 +231,9 @@ prototype ::=
 
 
 type ::=
-    INT {:RESULT = Type.INT;:}
+    INT:t {:RESULT = Type.INT;
+            //parser.cg.pushInformation(new ParsingResult<String>(ResultType.TYPE, t));
+          :}
   ;
     
 // A sequence of types for the prototype of a function
@@ -239,10 +249,10 @@ types_sequence ::=
 
 // Used for defining the types required for the arguments of a function
 types_list ::=
-    type
+    type:t {: //RESULT = t; :}
     
     // each variable type is seperated by a comma
-  | type COMMA types_list
+  | type:t {: //RESULT = t; :}  COMMA types_list
   ;
       
 // List of functions. It may be empty
@@ -319,12 +329,12 @@ instruction ::=
   
     // Return the value of an expression
   | RETURN expression:e
-      {: if(Parser.DEBUG) System.out.println("instruction detected: RETURN exp");
+      {: if(Parser.DEBUG) System.out.println("push instruction : RETURN exp : " + e);
          parser.cg.pushInstruction(new Instruction(e, InstructionType.RETURN)); :}
   
     // Return no value
   | RETURN 
-      {: if(Parser.DEBUG) System.out.println("instruction detected: RETURN");
+      {: if(Parser.DEBUG) System.out.println("push instruction: RETURN");
          parser.cg.pushInstruction(new Instruction(null, InstructionType.RETURN)); :}
   
     // Scanf(int)
@@ -351,7 +361,7 @@ instruction ::=
 // Defines the list of possible expressions to be used
 expression ::=
     expression:left bin_op:op expression:right
-      {: if(Parser.DEBUG) System.out.println("expression: " + op);
+      {: if(Parser.DEBUG) System.out.println("expression operator: " + op);
          RESULT = new ArithmeticResult<Expression>(op, left, right); :}
 
   | MINUS expression
@@ -362,7 +372,7 @@ expression ::=
       {: RESULT = e; :}
 
   | IDENT:i
-      {: if(Parser.DEBUG) System.out.println("expression: " + i);
+      {: if(Parser.DEBUG) System.out.println("expression ident: " + i);
          RESULT = new ArithmeticResult<String>(null, i);  :}
 
   | NB_INT:n
