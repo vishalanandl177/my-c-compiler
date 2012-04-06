@@ -3,7 +3,6 @@ package MyGCC;
 import java.util.Stack;
 import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.Map.Entry;
 import java.io.*;
 
 public class CodeGenerator{
