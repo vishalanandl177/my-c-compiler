@@ -37,6 +37,7 @@ public enum Register {
   private static HashSet<Register> special = new HashSet<Register>();
   
   private Register (String name, String comment, RegisterType t) {
+
     this.name = name;
     this.comment = comment;
     assignType(t);

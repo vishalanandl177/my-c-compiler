@@ -10,9 +10,8 @@ parser code {:
   public static Parser p;
   public static PrintStream ps;
   public static Boolean DEBUG = true;
-  public static char currentReg = 'c';
+  public static RegisterManager regMan = new RegisterManager();
   public CodeGenerator cg = new CodeGenerator();
-  public RegisterManager regMan = new RegisterManager();
 
   Parser(Scanner s, SymbolFactory sf, PrintStream ps){
     super(s,sf);
@@ -40,12 +39,6 @@ parser code {:
     p.ps.close();
   }
   
-
-  public static String getNextRegistry(){       
-    String s = new String("$e" + currentReg + "x");
-    currentReg++;
-    return s; 
-  }
 
   public void syntax_error(Symbol cur_token) { //overloads the default method
     report_error("*** Syntax Error at line "
@@ -304,9 +297,7 @@ body ::=
 
 // A list of instructions, each separated by semicolons
 instruct_list ::=
-    instruction:i SEMI
-                      {: parser.cg.handleInstruction(); :}
-                       instruct_list
+    instruction SEMI instruct_list
   |
   ;
         
@@ -329,7 +320,7 @@ instruction ::=
   
     // Return the value of an expression
   | RETURN expression:e
-      {: if(Parser.DEBUG) System.out.println("push instruction : RETURN exp : " + e);
+      {: if(Parser.DEBUG) System.out.println("push instruction : RETURN exp");
          parser.cg.pushInstruction(new Instruction(e, InstructionType.RETURN)); :}
   
     // Return no value
@@ -373,6 +364,7 @@ expression ::=
 
   | IDENT:i
       {: if(Parser.DEBUG) System.out.println("expression ident: " + i);
+         //declare ident in current block
          RESULT = new ArithmeticResult<String>(null, i);  :}
 
   | NB_INT:n

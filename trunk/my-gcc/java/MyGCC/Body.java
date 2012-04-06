@@ -52,6 +52,15 @@ public class Body {
   }
 
   public String toString(){
-    return null;//TODO
+    StringBuffer sb = new StringBuffer();
+    Instruction i;
+    Iterator<Instruction> iter = mainBlock.instructions.iterator();
+    
+    while(iter.hasNext()){
+      i = iter.next();
+      sb.append(Instruction.instructionToAssembly(i));
+    }
+    
+    return sb.toString();
   }
 }
