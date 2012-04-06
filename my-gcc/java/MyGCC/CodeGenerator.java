@@ -3,6 +3,7 @@ package MyGCC;
 import java.util.Stack;
 import java.util.LinkedList;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 import java.io.*;
 
 public class CodeGenerator{
@@ -37,16 +38,14 @@ public class CodeGenerator{
     myStack.add(new Stack<Object>());
   }
 
-  @SuppressWarnings("unchecked")
-public void declarePrototype(){
+  public void declarePrototype(){
     Type returnType = null;
     String name = null;
     ArrayList<Type> parameters = new ArrayList<Type>();
 
     Stack<Object> tmpStack = myStack.getLast();
     while (!tmpStack.isEmpty()){
-      @SuppressWarnings("rawtypes")
-	ParsingResult r = (ParsingResult) tmpStack.pop();
+      ParsingResult r = (ParsingResult) tmpStack.pop();
       switch (r.type){
         case TYPE :        returnType = ((ParsingResult<Type>)r).getValue(); break;
         case ID:           name       = ((ParsingResult<String>)r).getValue();       break;
@@ -60,8 +59,7 @@ public void declarePrototype(){
     //globalPrototypes.add(new Prototype(
   }
 
-  @SuppressWarnings("unchecked")
-public void startFunctionDefinition(){
+  public void startFunctionDefinition(){
     System.out.println("FUNCTIION");
     Type returnType = null;
     String name = null;
@@ -70,8 +68,7 @@ public void startFunctionDefinition(){
     Stack<Object> tmpStack = myStack.getLast();
     
     while (!tmpStack.isEmpty()){
-      @SuppressWarnings("rawtypes")
-	ParsingResult r = (ParsingResult) tmpStack.pop();
+      ParsingResult r = (ParsingResult) tmpStack.pop();
       switch (r.type){
         case TYPE :        returnType = ((ParsingResult<Type>)r).getValue(); break;
         case ID:           name       = ((ParsingResult<String>)r).getValue();       break;
@@ -84,15 +81,13 @@ public void startFunctionDefinition(){
   }
 
 
-  @SuppressWarnings("unchecked")
-public void declareVariable() {
+  public void declareVariable(){
     Type type = null;
     String identifier = null; 
     int arraySize = 0;
     Stack<Object> tmpStack = myStack.getLast();
     while(!tmpStack.isEmpty()) {
-      @SuppressWarnings("rawtypes")
-	ParsingResult r = (ParsingResult) tmpStack.pop();
+      ParsingResult r = (ParsingResult) tmpStack.pop();
       switch(r.type) {
         case TYPE : 
           type = ((ParsingResult<Type>)r).getValue();
@@ -111,39 +106,6 @@ public void declareVariable() {
       this.currentFunction.body.declarations.add(new Declaration(type, identifier, arraySize));
     }
   }
-  
-  public void handleInstruction(){
-    StringBuffer sb = new StringBuffer();
-    Instruction instr = currentFunction.body.mainBlock.instructions.getLast();
-    if(instr != null){
-      
-      if(instr.expr == null)
-        sb.append("\tleave\n\tret\n");
-      
-      switch(instr.instrType){
-        case RETURN:
-          sb.append("\tmovl " /*+ instr.expr.value*/ + ", %eax").append("\tleave\n\tret\n");
-          break;
-        case EXIT:
-          //TODO
-          break;  
-        case EQL:
-          sb.append("test EQL");
-          break;
-        default:
-          // case null, ie. for instructions like "1+2;"
-          // optimize and don't calculate?
-          break;
-      }
-      
-      instr.str = sb.toString();
-      System.out.println("myInstruct: " + instr.str + ", in function: " + this.currentFunction.name);
-      this.currentFunction.body.pushInstructionToBlock(instr);
-    }
-    else{
-      System.err.println("ERROR: instruction is null");
-    }
-}
 
   public String generateCode(){
     StringBuffer sb = new StringBuffer();
