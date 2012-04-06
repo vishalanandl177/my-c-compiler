@@ -38,14 +38,16 @@ public class CodeGenerator{
     myStack.add(new Stack<Object>());
   }
 
-  public void declarePrototype(){
+  @SuppressWarnings("unchecked")
+public void declarePrototype(){
     Type returnType = null;
     String name = null;
     ArrayList<Type> parameters = new ArrayList<Type>();
 
     Stack<Object> tmpStack = myStack.getLast();
     while (!tmpStack.isEmpty()){
-      ParsingResult r = (ParsingResult) tmpStack.pop();
+      @SuppressWarnings("rawtypes")
+	ParsingResult r = (ParsingResult) tmpStack.pop();
       switch (r.type){
         case TYPE :        returnType = ((ParsingResult<Type>)r).getValue(); break;
         case ID:           name       = ((ParsingResult<String>)r).getValue();       break;
@@ -59,7 +61,8 @@ public class CodeGenerator{
     //globalPrototypes.add(new Prototype(
   }
 
-  public void startFunctionDefinition(){
+  @SuppressWarnings("unchecked")
+public void startFunctionDefinition(){
     System.out.println("FUNCTIION");
     Type returnType = null;
     String name = null;
@@ -68,7 +71,8 @@ public class CodeGenerator{
     Stack<Object> tmpStack = myStack.getLast();
     
     while (!tmpStack.isEmpty()){
-      ParsingResult r = (ParsingResult) tmpStack.pop();
+      @SuppressWarnings("rawtypes")
+	ParsingResult r = (ParsingResult) tmpStack.pop();
       switch (r.type){
         case TYPE :        returnType = ((ParsingResult<Type>)r).getValue(); break;
         case ID:           name       = ((ParsingResult<String>)r).getValue();       break;
@@ -81,13 +85,15 @@ public class CodeGenerator{
   }
 
 
-  public void declareVariable() {
+  @SuppressWarnings("unchecked")
+public void declareVariable() {
     Type type = null;
     String identifier = null; 
     int arraySize = 0;
     Stack<Object> tmpStack = myStack.getLast();
     while(!tmpStack.isEmpty()) {
-      ParsingResult r = (ParsingResult) tmpStack.pop();
+      @SuppressWarnings("rawtypes")
+	ParsingResult r = (ParsingResult) tmpStack.pop();
       switch(r.type) {
         case TYPE : 
           type = ((ParsingResult<Type>)r).getValue();

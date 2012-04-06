@@ -23,7 +23,7 @@ public class Block {
       if(e != null)
         this.instructions.add(e);
       else
-        System.err.println("Object " + e.toString() + " is null");
+        System.err.println("The specified instruction is null");
     else
       System.err.println("this.Instructions: " + this.instructions + " is null");
   }
@@ -33,7 +33,7 @@ public class Block {
       if(bl != null)
         this.blocks.add(bl);
       else
-        System.err.println("Object " + bl.toString() + " is null");
+        System.err.println("The specified block is null");
     else
       System.err.println("this.blocks: " + this.blocks + " is null");
   }
