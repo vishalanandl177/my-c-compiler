@@ -41,40 +41,38 @@ public class CodeGenerator{
   public void declarePrototype(){
     Type returnType = null;
     String name = null;
-    LinkedList<Type> parameters = null;
+    ArrayList<Type> parameters = new ArrayList<Type>();
 
     Stack<Object> tmpStack = myStack.getLast();
     while (!tmpStack.isEmpty()){
-      Object o = tmpStack.pop();
-      if (o instanceof Type)
-        returnType = (Type) o;
-      else if (o instanceof String)
-        name = (String) o;
-      else if (o instanceof LinkedList)
-        parameters = (LinkedList<Type>) o;
+      ParsingResult r = (ParsingResult) tmpStack.pop();
+      switch (r.type){
+        case TYPE :        returnType = ((ParsingResult<Type>)r).getValue(); break;
+        case ID:           name       = ((ParsingResult<String>)r).getValue();       break;
+        case PARAMETER :   parameters.add(((ParsingResult<Type>)r).getValue());       break;
+      }
     }
     
     System.out.println("Declaring a prototype with :"
-                       + "\nReturnType : " + returnType
-                       + "\nname : " + name);
+                       + "\n\tReturnType : " + returnType
+                       + "\n\tname : " + name);
     //globalPrototypes.add(new Prototype(
   }
 
-  public void declareFunction(){
+  public void startFunctionDefinition(){
     System.out.println("FUNCTIION");
     Type returnType = null;
     String name = null;
     ArrayList<Parameter> parameters = null;
-    Body body = null; //TODO change to new Body() ?
+    Body body = new Body();
     Stack<Object> tmpStack = myStack.getLast();
     
     while (!tmpStack.isEmpty()){
       ParsingResult r = (ParsingResult) tmpStack.pop();
       switch (r.type){
-        case TYPE :   returnType = ((ParsingResult<Type>)r).getValue(); break;
-        case ID:          name       = ((ParsingResult<String>)r).getValue();       break;
-        case PARAMETERS :   parameters = ((ParsingResult<ArrayList<Parameter>>)r).getValue();       break;
-        case BODY:         body       = ((ParsingResult<Body>)r).getValue();       break;
+        case TYPE :        returnType = ((ParsingResult<Type>)r).getValue(); break;
+        case ID:           name       = ((ParsingResult<String>)r).getValue();       break;
+        case PARAMETERS :  parameters = ((ParsingResult<ArrayList<Parameter>>)r).getValue();       break;
       }
     }
     Function f = new Function(name, returnType, parameters, body);
@@ -101,7 +99,7 @@ public class CodeGenerator{
           arraySize = ((ParsingResult<Integer>)r).getValue();
           break;
         default:
-          System.err.println("WTF DUDE ?!, I don't know that type was even possible");
+          System.err.println("WTF DUDE ?!, I didn't know that type was even possible");
       }
     }
     if(currentFunction != null) {
@@ -152,10 +150,6 @@ public class CodeGenerator{
   
   public void closeFunction(){
     //TODO
-  }
-  
-  public void openNewFunction(){
-    currentFunction = new Function(null, null, null, new Body());
   }
 
 }

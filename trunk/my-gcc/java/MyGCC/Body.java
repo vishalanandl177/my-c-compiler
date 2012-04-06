@@ -50,4 +50,8 @@ public class Body {
   public Block getMainBlock() {
     return this.mainBlock;
   }
+
+  public String toString(){
+    return null;//TODO
+  }
 }

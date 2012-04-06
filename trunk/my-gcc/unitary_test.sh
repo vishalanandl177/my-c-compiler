@@ -4,8 +4,10 @@ ant
 
 OUR_COMPILER="java -jar jar/Compiler.jar"
 
-TEST4="tests/test4"
+TEST="tests/test3"
 
-$OUR_COMPILER $TEST4.c
+#TEST4="tests/test4"
 
-gcc $TEST4.s executor.c
+$OUR_COMPILER $TEST.c
+
+gcc $TEST.s executor.c
