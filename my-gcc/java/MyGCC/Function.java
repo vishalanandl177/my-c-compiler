@@ -25,6 +25,7 @@ public class Function{
     StringBuffer sb = new StringBuffer();
     sb.append(".globl "); sb.append(name); sb.append('\n');
     sb.append("\t.type\t"); sb.append(name); sb.append(", @function");
+    sb.append(body.toString());
     return sb.toString();
   }
   

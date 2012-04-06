@@ -134,22 +134,17 @@ hybrid_param ::=
 
     // A list of types ending with a semicolon, another declaration or
     // a function may follow
-    types_list:typeList RPAREN SEMI
+    types_list RPAREN SEMI
       {:
-        if(Parser.DEBUG) System.out.println("Push Type List : " + typeList);
-        parser.cg.pushInformation(new ParsingResult<ArrayList<Type>>(ResultType.PARAMETERS, typeList));
         parser.cg.declarePrototype();
       :}
     dec_func_list
     
     // List of the arguments for a function.
     // a function ends with a }
-  | param_list:p RPAREN LBRACKET
+  | param_list RPAREN LBRACKET
       {:
-        if(Parser.DEBUG) System.out.println("Push ParamList : " + p);
-        parser.cg.pushInformation(new ParsingResult<ArrayList<Entry<Type,String>>>(ResultType.PARAMETERS,p));
-        parser.cg.declareFunction();
-        parser.cg.openNewFunction();
+        parser.cg.startFunctionDefinition();
       :}
     body RBRACKET
       {:
@@ -175,10 +170,16 @@ dec_or_func_end ::=
     
     // If we have a function, it will be ended by { code }
     // And followed by a list of functions
-  | LBRACKET body:b RBRACKET {: if(Parser.DEBUG) System.out.println("Push body : " + b);
-                                parser.cg.pushInformation(b);
-                                parser.cg.declareFunction();
-                             :} functions_list
+  | LBRACKET
+      {:
+        parser.cg.startFunctionDefinition();
+      :}
+      body:b RBRACKET
+        {:
+          if(Parser.DEBUG) System.out.println("Push body : " + b);
+          parser.cg.pushInformation(b);
+        :}
+        functions_list
   ;
 
 // Defines the constraints of a list of declarations
@@ -245,7 +246,10 @@ types_sequence ::=
 
 // Used for defining the types required for the arguments of a function
 types_list ::=
-    type:t {: //RESULT = t; :}
+    type:t
+      {: parser.cg.pushInformation(new ParsingResult<Type>(ResultType.PARAMETER, t));
+         //RESULT = t;
+      :}
     
     // each variable type is seperated by a comma
   | type:t {: //RESULT = t; :}  COMMA types_list
