@@ -49,8 +49,9 @@ public class Function{
    */
   private void prepareLocalVariablesLocation(){
 	  variablesTotalSize = 0;
-	  for (Entry<String, Type> type : localVariables.entrySet()){
-		  variablesTotalSize += type.getValue().size;
+	  for (Entry<String, Type> e : localVariables.entrySet()){
+		  variablesTotalSize += e.getValue().size;
+		  variablesLocations.put(e.getKey(), -variablesTotalSize);
 	  }
 	  variablesTotalSize = variablesTotalSize + (16 -variablesTotalSize % 16);
 	  
