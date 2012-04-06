@@ -22,7 +22,7 @@ public class Body {
       if(d != null)
         this.declarations.add(d);
       else
-        System.err.println("Object " + d.toString() + " is null");
+        System.err.println("The specified declaration is null");
     else
       System.err.println("this.declarations: " + this.declarations + " is null");
   }
@@ -34,7 +34,7 @@ public class Body {
         System.out.println("instruction added to block");
       }
       else
-        System.err.println("Object " + i.toString() + " is null");
+        System.err.println("The specified instruction is null");
     else
       System.err.println("this.mainBlock: " + this.mainBlock + " is null");
   }

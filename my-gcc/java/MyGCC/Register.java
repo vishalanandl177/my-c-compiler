@@ -29,23 +29,23 @@ public enum Register {
     //UNUSED; Would be useful if ever we decided to compile additionnal languages
   }
   
-  private static String name;
-  private static String comment;
-  private static RegisterType type;
+  private String name;
+  private String comment;
+  private RegisterType type;
   private static HashSet<Register> calleeSaved = new HashSet<Register>();
   private static HashSet<Register> callerSaved = new HashSet<Register>();
   private static HashSet<Register> special = new HashSet<Register>();
   
   private Register (String name, String comment, RegisterType t) {
-    name = name;
-    comment = comment;
+    this.name = name;
+    this.comment = comment;
     assignType(t);
     
     Register.addRegister(this, t);
   }
   
-  private static void assignType(RegisterType t) {
-    type = t;
+  private void assignType(RegisterType t) {
+    this.type = t;
   }
   
   private static void addRegister(Register reg, RegisterType t) {
@@ -64,15 +64,18 @@ public enum Register {
     }
   }
   
-  public static HashSet<Register> getCalleeSaved() {
+  @SuppressWarnings("unchecked")
+public static HashSet<Register> getCalleeSaved() {
     return (HashSet<Register>)calleeSaved.clone();
   }
   
-  public static HashSet<Register> getCallerSaved() {
+  @SuppressWarnings("unchecked")
+public static HashSet<Register> getCallerSaved() {
     return (HashSet<Register>)callerSaved.clone();
   }
   
-  public static HashSet<Register> getSpecial() {
+  @SuppressWarnings("unchecked")
+public static HashSet<Register> getSpecial() {
     return (HashSet<Register>)special.clone();
   }
   
