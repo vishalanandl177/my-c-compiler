@@ -38,7 +38,8 @@ public class CodeGenerator{
     myStack.add(new Stack<Object>());
   }
 
-  public void declarePrototype(){
+  @SuppressWarnings("unchecked")
+public void declarePrototype(){
     Type returnType = null;
     String name = null;
     ArrayList<Type> parameters = new ArrayList<Type>();
@@ -59,20 +60,21 @@ public class CodeGenerator{
     //globalPrototypes.add(new Prototype(
   }
 
-  public void startFunctionDefinition(){
+  @SuppressWarnings("unchecked")
+public void startFunctionDefinition(){
     System.out.println("FUNCTIION");
     Type returnType = null;
     String name = null;
-    ArrayList<Parameter> parameters = null;
+    ArrayList<Parameter> parameters = new ArrayList<Parameter>();
     Body body = new Body();
     Stack<Object> tmpStack = myStack.getLast();
     
     while (!tmpStack.isEmpty()){
       ParsingResult r = (ParsingResult) tmpStack.pop();
       switch (r.type){
-        case TYPE :        returnType = ((ParsingResult<Type>)r).getValue(); break;
-        case ID:           name       = ((ParsingResult<String>)r).getValue();       break;
-        case PARAMETERS :  parameters = ((ParsingResult<ArrayList<Parameter>>)r).getValue();       break;
+        case TYPE :        returnType = ((ParsingResult<Type>)r).getValue();          break;
+        case ID:           name       = ((ParsingResult<String>)r).getValue();        break;
+        case PARAMETER :   parameters.add(((ParsingResult<Parameter>)r).getValue());  break;
       }
     }
     Function f = new Function(name, returnType, parameters, body);
@@ -81,7 +83,8 @@ public class CodeGenerator{
   }
 
 
-  public void declareVariable(){
+  @SuppressWarnings("unchecked")
+public void declareVariable(){
     Type type = null;
     String identifier = null; 
     int arraySize = 0;
@@ -99,6 +102,7 @@ public class CodeGenerator{
           arraySize = ((ParsingResult<Integer>)r).getValue();
           break;
         default:
+          System.err.println("Unexpected Type :" + r.type);
           System.err.println("WTF DUDE ?!, I didn't know that type was even possible");
       }
     }

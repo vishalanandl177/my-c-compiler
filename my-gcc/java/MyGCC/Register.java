@@ -1,5 +1,6 @@
 package MyGCC;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.lang.String;
 
@@ -35,22 +36,38 @@ public enum Register {
   private static HashSet<Register> calleeSaved = new HashSet<Register>();
   private static HashSet<Register> callerSaved = new HashSet<Register>();
   private static HashSet<Register> special = new HashSet<Register>();
+  private static ArrayList<Register> arguments = new ArrayList<Register>();
+  
+  static {
+    arguments.add(EDI);
+    arguments.add(ESI);
+    arguments.add(EDX);
+    arguments.add(ECX);
+    arguments.add(R8D);
+    arguments.add(R9D);
+    
+    for (Register r : Register.values()){
+      addRegister(r);
+    }
+  }
+  
+  public static Register getArgumentRegister(int i){
+    return arguments.get(i);
+  }
   
   private Register (String name, String comment, RegisterType t) {
 
     this.name = name;
     this.comment = comment;
     assignType(t);
-    
-    Register.addRegister(this, t);
   }
   
   private void assignType(RegisterType t) {
     this.type = t;
   }
   
-  private static void addRegister(Register reg, RegisterType t) {
-    switch(t) {
+  private static void addRegister(Register reg) {
+    switch(reg.type) {
       case CALLEE_SAVED:
         calleeSaved.add(reg);
         break;
