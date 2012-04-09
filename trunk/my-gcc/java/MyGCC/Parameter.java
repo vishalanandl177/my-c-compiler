@@ -10,5 +10,10 @@ public class Parameter{
     this.type = type;
     this.name = name; 
   }
+  
+  /* Since Parameter can be a key of an HashMap, this function has to be overrided */
+  public int hashCode(){
+	  return name.hashCode();
+  }
 
 }

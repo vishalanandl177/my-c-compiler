@@ -4,11 +4,12 @@ import java_cup.runtime.*;
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
+import MyGCC.Parameter;
 
 parser code {:
 
   public static Parser p;
-  public static PrintStream ps;
+  public PrintStream ps;
   public static Boolean DEBUG = true;
   public static RegisterManager regMan = new RegisterManager();
   public CodeGenerator cg = new CodeGenerator();
@@ -33,9 +34,9 @@ parser code {:
                                new PrintStream(destination_file));
     //System.out.println("modified version");
     //p.debug_parse();
-    p.ps.println("\t.file \""+ args[0]+"\"\n\t.text\n");
+    p.ps.print("\t.file \""+ args[0]+"\"\n\t.text\n");
     p.parse();
-    p.ps.println(p.cg.generateCode());
+    p.ps.print(p.cg.generateCode());
     p.ps.close();
   }
   
@@ -62,10 +63,11 @@ terminal Integer NB_INT;
 
 non terminal program, declarations_list, declaration, prototype,
              functions_list, function, header,
-             parameter, body, instruct_list,
+             body, instruct_list,
              arg_sequence, args_list, dec_func_list, dec_end, proto_func,
              hybrid_param, dec_or_func_end, arr, arr_proto;
 
+non terminal Parameter parameter;
 non terminal Type type;
 non terminal ArrayList<Type> types_list, types_sequence;
 non terminal ArrayList<Entry<Type,String>> param_list, param_sequence;
@@ -86,7 +88,7 @@ program ::= dec_func_list;
 dec_func_list ::=
 
     // Format for the declaration of a static variable, each declaration is
-    // seperated by a semicolon
+    // separated by a semicolon
     STATIC type IDENT arr SEMI dec_func_list
     
     // Format for the declaration of a non-static variable, or a prototype
@@ -221,8 +223,8 @@ prototype ::=
 
 
 type ::=
-    INT:t {:RESULT = Type.INT;
-            //parser.cg.pushInformation(new ParsingResult<String>(ResultType.TYPE, t));
+    INT:t {:
+    		RESULT = Type.INT;
           :}
   ;
     
@@ -240,12 +242,16 @@ types_sequence ::=
 // Used for defining the types required for the arguments of a function
 types_list ::=
     type:t
-      {: parser.cg.pushInformation(new ParsingResult<Type>(ResultType.PARAMETER, t));
-         //RESULT = t;
+      {:
+      	parser.cg.pushInformation(new ParsingResult<Type>(ResultType.PARAMETER, t));
       :}
     
-    // each variable type is seperated by a comma
-  | type:t {: //RESULT = t; :}  COMMA types_list
+    // each variable type is separated by a comma
+  | type:t
+  	  {: 
+      	parser.cg.pushInformation(new ParsingResult<Type>(ResultType.PARAMETER, t));
+      :}
+      COMMA types_list
   ;
       
 // List of functions. It may be empty
@@ -273,21 +279,31 @@ param_sequence ::=
   | param_list
   ;
 
-// A list of parameters, each seperated by a comma.
+// A list of parameters, each separated by a comma.
 param_list ::=
 
     // a param_list may contain a single parameter
-    parameter
-  | parameter COMMA param_list
+    parameter:p
+      {:
+      	parser.cg.pushInformation(new ParsingResult<Parameter>(ResultType.PARAMETER, p));
+  	  :}
+  | parameter:p
+      {:
+      	parser.cg.pushInformation(new ParsingResult<Parameter>(ResultType.PARAMETER, p));
+  	  :}
+  	  COMMA param_list
   ;
       
 // A parameter MUST be a variable
 parameter ::=
 
-    INT IDENT
+    type:t IDENT:id
+      {:
+  		RESULT = new Parameter(t,id);
+      :}
     
     // The variable can be an array
-  | INT IDENT LHOOK NB_INT RHOOK
+  | type IDENT LHOOK NB_INT RHOOK
   ;
      
 // The body of a function is composed of declarations and instructions
