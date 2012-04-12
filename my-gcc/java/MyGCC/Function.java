@@ -49,7 +49,7 @@ public class Function{
     sb.append('.'); sb.append(LabelManager.getBeginLabel(i)); sb.append(":\n");
     sb.append(prelude());
     sb.append(loadParameters());
-    //sb.append(body.toString());
+    sb.append(body.toString());
     sb.append(epilogue());
     sb.append('.'); sb.append(LabelManager.getEndLabel(i)); sb.append(":\n");
     sb.append("\t.size "); sb.append(name); sb.append(", .-"); sb.append(name); sb.append('\n');

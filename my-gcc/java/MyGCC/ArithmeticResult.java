@@ -4,13 +4,13 @@ public class ArithmeticResult<T> extends Expression{
   
   private T value;
 
-  public ArithmeticResult(String op, T value){
+  public ArithmeticResult(OperationType op, T value){
       super();
       this.op = op;
       this.value = value;
     }
     
-    public ArithmeticResult(String op, Expression l, Expression r){
+    public ArithmeticResult(OperationType op, Expression l, Expression r){
       super();
       this.op = op;
       this.left = l;

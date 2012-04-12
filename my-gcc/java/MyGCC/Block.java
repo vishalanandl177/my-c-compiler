@@ -26,7 +26,7 @@ public class Block {
       else
         System.err.println("The specified instruction is null");
     else
-      System.err.println("this.Instructions: is null");
+      System.err.println("this.instructions: is null");
   }
   
   public void pushBlock(Block bl) {

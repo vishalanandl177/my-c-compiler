@@ -31,7 +31,7 @@ public class Body {
     if(this.mainBlock != null)
       if(i != null){
         this.mainBlock.instructions.add(i);
-        System.out.println("instruction added to block");
+        //System.out.println("instruction added to block");
       }
       else
         System.err.println("The specified instruction is null");
