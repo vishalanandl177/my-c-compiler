@@ -4,7 +4,7 @@ public abstract class Expression{
   
     public Expression left;
     public Expression right;
-    public String op;
+    public OperationType op;
     
     public Expression(){
       this.left = null;

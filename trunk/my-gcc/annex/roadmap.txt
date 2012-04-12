@@ -3,24 +3,25 @@
 ----------------------------
 
 -> Grammar
-   -> jflex
-   -> cup
+   -> jflex: OK
+   -> cup: OK
 -> Code generation
-   -> via cup
+   -> via cup: OK
 -> Identifier managing
    -> Context
-      -> global
-      -> function
-      -> block
+      -> global: TODO
+      -> function: OK
+      -> block: TODO
    -> HashMap<String, Variable>
    -> Variable
-      -> identifier
-      -> function
-      	 -> return type
+      -> identifier: OK
+      -> function: OK
+      	 -> return type: TODO
 	 -> argument
 	 -> ? associated code ?
       -> var
       	 -> type
+   -> TODO: if/else
 	 -> ? array ?
 	 -> ? pointer ?
 

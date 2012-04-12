@@ -29,6 +29,7 @@ public class RegisterManager {
   
   /**
    * Returns a Register that has no assigned variable.
+   * 'e' for callee-saved, 'r' for caller-saved
    **/
   public Register getFreeRegister(char type) {
     ArrayList<HashSet<Register>> al = new ArrayList<HashSet<Register>>();
@@ -48,7 +49,7 @@ public class RegisterManager {
         list = Register.getCalleeSaved();
         al.add(list);
     }
-        
+    
     Register r;
     Iterator<Register> iter;
     
@@ -65,10 +66,12 @@ public class RegisterManager {
     return freeUselessRegister(type); // No free registers have been found, we should now attempt to free some by pushing to the stack.
   }
   
+
   /**
    * Returns a pair of Registers, in order to perform more complex tasks
    **/
   public SimpleEntry<Register, Register> getTwoRegisters(char type) { // TODO Resolve : When two registers are called upon, they will both have the same type ? (yes ?)
+
     
     ArrayList<HashSet<Register>> al = new ArrayList<HashSet<Register>>();   
     HashSet<Register> list;
@@ -105,6 +108,7 @@ public class RegisterManager {
       if(r1 != null && r2 != null)
         return (new SimpleEntry<Register, Register>(r1, r2));
     }
+
 
     System.err.println("Assigning two registers failed"); // This should never happen unless the code is faulty
     return null; //TODO attempt to free two registers by pushing some to the stack
@@ -182,6 +186,7 @@ public class RegisterManager {
       System.err.println("The variable was not set to any registers.");
   }
   
+
   public Register freeUselessRegister(char type) {
     /* 
      * TODO find a register that can be removed from the list of used registers with the "type" category
@@ -217,4 +222,5 @@ public class RegisterManager {
     System.out.println("r9 : " + r9.toString());
     System.out.println("r10 : " + r10.toString());*/
   }
+
 }

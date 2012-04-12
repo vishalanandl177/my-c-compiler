@@ -71,7 +71,7 @@ non terminal Parameter parameter;
 non terminal Type type;
 non terminal ArrayList<Type> types_list, types_sequence;
 non terminal ArrayList<Entry<Type,String>> param_list, param_sequence;
-non terminal String bin_op;
+non terminal OperationType bin_op;
 non terminal Expression expression;
 non terminal Instruction instruction;
 
@@ -411,30 +411,30 @@ args_list ::=
 // List of accepted binary operators
 bin_op ::=
     LESS
-    {: RESULT = new String(OperationType.LESS.toString()); :}
+    {: RESULT = OperationType.LESS; :}
   | GREATER
-    {: RESULT = new String(OperationType.GREATER.toString()); :}
+    {: RESULT = OperationType.GREATER; :}
   | EQUALS
-    {: RESULT = new String(OperationType.EQUALS.toString()); :}
+    {: RESULT = OperationType.EQUALS; :}
   | LEQL
-    {: RESULT = new String(OperationType.LEQL.toString()); :}
+    {: RESULT = OperationType.LEQL; :}
   | GEQL
-    {: RESULT = new String(OperationType.GEQL.toString()); :}
+    {: RESULT = OperationType.GEQL; :}
   | DIFF
-    {: RESULT = new String(OperationType.DIFF.toString()); :}
+    {: RESULT = OperationType.DIFF; :}
   | PLUS
-    {: RESULT = new String(OperationType.ADD.toString()); :}
+    {: RESULT = OperationType.ADD; :}
   | MINUS
-    {: RESULT = new String(OperationType.SUB.toString()); :}
+    {: RESULT = OperationType.SUB; :}
   | TIMES
-    {: RESULT = new String(OperationType.MUL.toString()); :}
+    {: RESULT = OperationType.MUL; :}
   | DIV
-    {: RESULT = new String(OperationType.DIV.toString()); :}
+    {: RESULT = OperationType.DIV; :}
   | MOD
-    {: RESULT = new String(OperationType.MOD.toString()); :}  
+    {: RESULT = OperationType.MOD; :}  
   | OR
-    {: RESULT = new String(OperationType.OR.toString()); :}
+    {: RESULT = OperationType.OR; :}
   | AND
-    {: RESULT = new String(OperationType.AND.toString()); :}
+    {: RESULT = OperationType.AND; :}
   ;
      

@@ -33,9 +33,9 @@ public enum Register {
   private String name;
   private String comment;
   private RegisterType type;
-  private static HashSet<Register> calleeSaved = new HashSet<Register>();
-  private static HashSet<Register> callerSaved = new HashSet<Register>();
-  private static HashSet<Register> special = new HashSet<Register>();
+  public static HashSet<Register> calleeSaved = new HashSet<Register>();
+  public static HashSet<Register> callerSaved = new HashSet<Register>();
+  public static HashSet<Register> special = new HashSet<Register>();
   private static ArrayList<Register> arguments = new ArrayList<Register>();
   
   static {
@@ -59,7 +59,7 @@ public enum Register {
 
     this.name = name;
     this.comment = comment;
-    assignType(t);
+    this.type = t;
   }
   
   private void assignType(RegisterType t) {
@@ -78,22 +78,21 @@ public enum Register {
         special.add(reg);
         break;
       default:
-        System.err.println("The RegisterType that was passed to this function is incorrect");
+        System.err.println("The RegisterType passed to this function is incorrect");
     }
   }
   
   @SuppressWarnings("unchecked")
-public static HashSet<Register> getCalleeSaved() {
+  public static HashSet<Register> getCalleeSaved() {
     return (HashSet<Register>)calleeSaved.clone();
   }
   
-  @SuppressWarnings("unchecked")
-public static HashSet<Register> getCallerSaved() {
-    return (HashSet<Register>)callerSaved.clone();
+  public static HashSet<Register> getCallerSaved() {
+    return (HashSet<Register>)callerSaved;
   }
   
   @SuppressWarnings("unchecked")
-public static HashSet<Register> getSpecial() {
+  public static HashSet<Register> getSpecial() {
     return (HashSet<Register>)special.clone();
   }
   
