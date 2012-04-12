@@ -89,8 +89,8 @@ public class Function{
   }
   
   /** Initially, some parameters are left in some caller-saved Registers.
-   *  This function return the String that ensure that the parameters are
-   *  loaded before starting really the code **/
+   *  This function returns the String that ensures that the parameters are
+   *  loaded before starting the code **/
   private String loadParameters(){
     prepareParametersLocation();
     StringBuilder sb = new StringBuilder();

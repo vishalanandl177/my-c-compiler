@@ -12,7 +12,7 @@ public enum Register {
   EDX ("edx", "3rd Argument", RegisterType.CALLER_SAVED),
   ESI ("esi", "2nd Argument", RegisterType.CALLER_SAVED),
   EDI ("edi", "1st Argument", RegisterType.CALLER_SAVED),
-  EBP ("ebp", "", RegisterType.CALLEE_SAVED),
+  EBP ("ebp", "", RegisterType.SPECIAL), // Technically not a special variable, but will be treated as one
   ESP ("esp", "Stack Pointer", RegisterType.SPECIAL),
   R8D ("r8d", "5th Argument", RegisterType.CALLER_SAVED),
   R9D ("r9d", "6th Argument", RegisterType.CALLER_SAVED),
@@ -95,6 +95,21 @@ public static HashSet<Register> getCallerSaved() {
   @SuppressWarnings("unchecked")
 public static HashSet<Register> getSpecial() {
     return (HashSet<Register>)special.clone();
+  }
+  
+  public RegisterType getType() {
+    return this.type;
+  }
+  
+  public String getTypeString() {
+    switch(this.type) {
+      case CALLEE_SAVED:
+        return new String("CALLEE_SAVED");
+      case CALLER_SAVED:
+        return new String("CALLER_SAVED");
+      default:
+        return new String("SPECIAL");
+    }
   }
   
   public String toString() {
