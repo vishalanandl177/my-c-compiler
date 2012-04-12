@@ -15,6 +15,7 @@ public class CodeGenerator{
   private Context globalContext;
   private Context actualContext;
   private Function currentFunction;
+  private Block currentBlock = null;
 
   public CodeGenerator(){
     myStack = new LinkedList<Stack<Object>>();
@@ -25,7 +26,7 @@ public class CodeGenerator{
     if(currentFunction == null)
       System.err.println("ERROR: currentFunction is null");
       
-    currentFunction.body.pushInstructionToBlock(i);
+    this.currentBlock.pushInstructionToBlock(i);
   }
 
   public void pushInformation(Object o){
@@ -48,8 +49,8 @@ public void declarePrototype(){
     while (!tmpStack.isEmpty()){
       ParsingResult r = (ParsingResult) tmpStack.pop();
       switch (r.type){
-        case TYPE :        returnType = ((ParsingResult<Type>)r).getValue(); break;
-        case ID:           name       = ((ParsingResult<String>)r).getValue();       break;
+        case TYPE :        returnType = ((ParsingResult<Type>)r).getValue();          break;
+        case ID:           name       = ((ParsingResult<String>)r).getValue();        break;
         case PARAMETER :   parameters.add(((ParsingResult<Type>)r).getValue());       break;
       }
     }
@@ -80,6 +81,16 @@ public void startFunctionDefinition(){
     Function f = new Function(name, returnType, parameters, body);
     globalFunctions.add(f);
     this.currentFunction = f;
+  }
+  
+  public void startBlockDefinition() {
+    Block b = new Block();
+    b.parent = this.currentBlock;
+    this.currentBlock = b;
+  }
+  
+  public void closeBlockDefinition() {
+    this.currentBlock = this.currentBlock.parent;
   }
 
 

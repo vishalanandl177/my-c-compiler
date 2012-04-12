@@ -4,6 +4,7 @@ import java.util.*;
 
 public class Block {
   
+  public Block parent = null;
   public LinkedList<Instruction> instructions;
   public LinkedList<Block> blocks;
 
@@ -25,7 +26,7 @@ public class Block {
       else
         System.err.println("The specified instruction is null");
     else
-      System.err.println("this.Instructions: " + this.instructions + " is null");
+      System.err.println("this.Instructions: is null");
   }
   
   public void pushBlock(Block bl) {
@@ -35,7 +36,7 @@ public class Block {
       else
         System.err.println("The specified block is null");
     else
-      System.err.println("this.blocks: " + this.blocks + " is null");
+      System.err.println("this.blocks: is null");
   }
 
   public LinkedList<Instruction> getInstructions() {

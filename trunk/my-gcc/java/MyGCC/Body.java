@@ -24,7 +24,7 @@ public class Body {
       else
         System.err.println("The specified declaration is null");
     else
-      System.err.println("this.declarations: " + this.declarations + " is null");
+      System.err.println("this.declarations: is null");
   }
   
   public void pushInstructionToBlock(Instruction i) {
@@ -36,7 +36,7 @@ public class Body {
       else
         System.err.println("The specified instruction is null");
     else
-      System.err.println("this.mainBlock: " + this.mainBlock + " is null");
+      System.err.println("this.mainBlock: is null");
   }
   
   public void addBlock(){
