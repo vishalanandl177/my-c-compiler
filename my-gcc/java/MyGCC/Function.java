@@ -8,34 +8,18 @@ import java.util.Map.Entry;
 public class Function{
   
   private Type returnType;
-  private ArrayList<Parameter> parameters = new ArrayList<Parameter>();
   public String name;
   public Body body;
-  /** Contain the "virtual" location of the parameters,
-   *  for example: if the parameter <i>p</i> is in <i>-4(%rbp)</i>, the tuple will be <i>(p,-4)</i> **/
-  private HashMap<Parameter,Integer> parametersLocations = new HashMap<Parameter,Integer>();
-  /** Contain all the variables local to the function with their type **/
-  private HashMap<String,Type> localVariables = new HashMap<String,Type>();
-  /** Contain the "virtual" location of the variables,
-   *  for example: if <i>a</i> is in <i>-4(%rbp)</i>, the tuple will be <i>(a,-4)</i> **/
-  private HashMap<String,Integer> variablesLocations = new HashMap<String, Integer>();
-  /** This is the place taken by all the local variables in bytes,
-   *  Like with gcc, it is always a multiple of 16.
-   **/
-  private int variablesTotalSize;
-  /** useful for a lazy-mecanism **/
-  private boolean localVariablesLocated = false;
-  private boolean parametersLocated = false;
+  private FunctionContext myContext;
 
   public Function(String name,
                   Type returnType,
-                  ArrayList<Parameter> parameters,
-                  Body body){
+                  ArrayList<Parameter> parameters){
     this.name = name;
     this.returnType = returnType;
-    this.parameters = parameters;
-    this.body = body;
-    
+    this.myContext = new FunctionContext(null);
+    myContext.setParameters(parameters);
+    body = new Body(myContext);
   }
   
   
@@ -56,50 +40,22 @@ public class Function{
     return sb.toString();
   }
   
-  /**
-   * When a function is called,
-   * local variables will always be used like <i>-...(%rbp)</i>
-   * We use a mapping in order to get the track of all this location
-   */
-  private void prepareLocalVariablesLocation(){
-	  if (localVariablesLocated) return;
-	  variablesTotalSize = 0;
-	  for (Entry<String, Type> e : localVariables.entrySet()){
-		  variablesTotalSize += e.getValue().size;
-		  variablesLocations.put(e.getKey(), -variablesTotalSize);
-	  }
-	  variablesTotalSize = variablesTotalSize + (16 -variablesTotalSize % 16);
-	  localVariablesLocated = true;
-  }
-  
-  private void prepareParametersLocation(){
-    if (parametersLocated) return;
-    prepareLocalVariablesLocation();
-	  int k = 1;
-	  if (parameters != null){// TODO usually parameters should never be null but that's an issue coming from the parser
-	    for (Parameter p : parameters){
-	      if (k <= 6)
-	        parametersLocations.put(p,-variablesTotalSize - 4 * k);
-	      else
-	        parametersLocations.put(p, (k - 7) * 8);
-	      k++;
-	    }
-	  }
-	  parametersLocated = false;
-  }
-  
   /** Initially, some parameters are left in some caller-saved Registers.
    *  This function returns the String that ensures that the parameters are
    *  loaded before starting the code **/
   private String loadParameters(){
-    prepareParametersLocation();
+    myContext.prepareParametersLocation();
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < parameters.size(); i++){
+    for (int i = 0; i < myContext.nbParameters() && i < 6; i++){
       sb.append("\tmovl\t%");
       sb.append(Register.getArgumentRegister(i));
       sb.append(", ");
-      sb.append(parametersLocations.get(parameters.get(i)));
-      sb.append("(%rbp)\n");
+      try{
+      sb.append(myContext.getVariableLocation(myContext.getParameter(i).name));
+      System.out.println("\tParameter : " + myContext.getParameter(i).name);
+      System.out.println("\tLocation : " + myContext.getVariableLocation(myContext.getParameter(i).name));
+      }catch(Exception e){e.printStackTrace();}
+      sb.append("\n");
     }
     return sb.toString();
   }
@@ -125,6 +81,12 @@ public class Function{
     sb.append("\t.cfi_endproc\n");
     return sb.toString();    
   }
+
+
+
+  public void addDeclaration(Type type, String identifier, int arraySize) {
+	  myContext.addVariable(type, identifier, arraySize);
+  }
   
   /*public Type getReturn() {
     return this.retType;
@@ -133,6 +95,8 @@ public class Function{
   public String getIdentifier() {
     return this.identifier;
   }
+  
+}
   
   public ArrayList<Entry<Type,String>> getArguments() {
     return this.arguments;

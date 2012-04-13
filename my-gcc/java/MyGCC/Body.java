@@ -6,15 +6,18 @@ public class Body {
   
   public LinkedList<Declaration> declarations;
   public Block mainBlock;
+  private Context myContext;
   
-  public Body() {
+  public Body(Context c) {
     this.declarations = new LinkedList<Declaration>();
     this.mainBlock = new Block();
+    this.myContext = c;
   }
   
-  public Body(LinkedList<Declaration> dec, Block b) {
+  public Body(LinkedList<Declaration> dec, Block b, Context c) {
     this.declarations = dec;
     this.mainBlock = b;
+    this.myContext = c;
   }
   
   public void pushDeclaration(Declaration d) {
@@ -58,7 +61,9 @@ public class Body {
     
     while(iter.hasNext()){
       i = iter.next();
-      sb.append(Instruction.instructionToAssembly(i));
+      try{
+      sb.append(Instruction.instructionToAssembly(i, myContext));
+      }catch(Exception e){e.printStackTrace();}
     }
     
     return sb.toString();

@@ -1,5 +1,6 @@
 package MyGCC;
 
+import java.util.Collections;
 import java.util.Stack;
 import java.util.LinkedList;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public void declarePrototype(){
         case PARAMETER :   parameters.add(((ParsingResult<Type>)r).getValue());       break;
       }
     }
-    
+    Collections.reverse(parameters);
     System.out.println("Declaring a prototype with :"
                        + "\n\tReturnType : " + returnType
                        + "\n\tname : " + name);
@@ -67,7 +68,6 @@ public void startFunctionDefinition(){
     Type returnType = null;
     String name = null;
     ArrayList<Parameter> parameters = new ArrayList<Parameter>();
-    Body body = new Body();
     Stack<Object> tmpStack = myStack.getLast();
     
     while (!tmpStack.isEmpty()){
@@ -78,7 +78,8 @@ public void startFunctionDefinition(){
         case PARAMETER :   parameters.add(((ParsingResult<Parameter>)r).getValue());  break;
       }
     }
-    Function f = new Function(name, returnType, parameters, body);
+    Collections.reverse(parameters);
+    Function f = new Function(name, returnType, parameters);
     globalFunctions.add(f);
     this.currentFunction = f;
     this.currentBlock = f.body.mainBlock;
@@ -119,7 +120,8 @@ public void declareVariable(){
       }
     }
     if(currentFunction != null) {
-      this.currentFunction.body.declarations.add(new Declaration(type, identifier, arraySize));
+    	currentFunction.addDeclaration(type,identifier, arraySize);
+      //this.currentFunction.body.declarations.add(new Declaration(type, identifier, arraySize));
     }
   }
 
