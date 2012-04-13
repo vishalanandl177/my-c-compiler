@@ -6,6 +6,7 @@ public class Instruction {
   public Expression rexpr;
   public InstructionType instrType;
   public String assemblyStr;
+  public Context myContext = null;
   
   public Instruction(Expression r, InstructionType op){
     this.lexpr = null;
@@ -49,7 +50,7 @@ public class Instruction {
   }
   
   
-  public static String instructionToAssembly(Instruction instruct){
+  public static String instructionToAssembly(Instruction instruct, Context context) throws Exception{
     StringBuffer sb = new StringBuffer();
     String left = new String();
     String right = new String();
@@ -76,6 +77,7 @@ public class Instruction {
       
       /*if(instruct.expr instanceof FunctionCall){
         //TODO
+         * 
       }*/
       
       switch(instruct.instrType){
@@ -104,17 +106,17 @@ public class Instruction {
             
           else if(tmpL.getValue() instanceof Integer && tmpR.getValue() instanceof String){
               regR = Parser.regMan.addVariableToRegister(right, 'e');
-              sb.append("\tmovl %" + tmpR.getValue() + ", %" + regR.toString() + "\n");
+              sb.append("\tmovl %" + context.getVariableLocation((String)tmpR.getValue()) + ", %" + regR.toString() + "\n");
               sb.append("\t" + instruct.rexpr.op.toString() + " %" + tmpL.getValue() + ", %" + regR.toString() + "\n");
           }
             
           else if(tmpL.getValue() instanceof String && tmpR.getValue() instanceof Integer){
               regR = Parser.regMan.addVariableToRegister(left, 'e');
-              sb.append("\tmovl %" + tmpL.getValue() + ", %" + regR.toString() + "\n");
+              sb.append("\tmovl %" + context.getVariableLocation((String)tmpL.getValue()) + ", %" + regR.toString() + "\n");
               sb.append("\t" + instruct.rexpr.op.toString() + " %" + tmpR.getValue() + ", %" + regR.toString() + "\n");
           }
           
-          sb.append("\tmovl %" + regR.toString() + ", -x(%rbp)" + "\n");
+          sb.append("\tmovl %" + regR.toString() + ", " + context.getVariableLocation("c") + "\n");
           
           break;
           
