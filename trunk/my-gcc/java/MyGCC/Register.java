@@ -6,14 +6,14 @@ import java.lang.String;
 
 public enum Register {
   
-  EAX ("eax", "Return Value", RegisterType.CALLER_SAVED),
-  EBX ("ebx", "", RegisterType.CALLEE_SAVED),
-  ECX ("ecx", "4th Argument", RegisterType.CALLER_SAVED),
-  EDX ("edx", "3rd Argument", RegisterType.CALLER_SAVED),
-  ESI ("esi", "2nd Argument", RegisterType.CALLER_SAVED),
-  EDI ("edi", "1st Argument", RegisterType.CALLER_SAVED),
-  EBP ("ebp", "", RegisterType.SPECIAL), // Technically not a special variable, but will be treated as one
-  ESP ("esp", "Stack Pointer", RegisterType.SPECIAL),
+  RAX ("rax", "Return Value", RegisterType.CALLER_SAVED),
+  RBX ("rbx", "", RegisterType.CALLEE_SAVED),
+  RCX ("rcx", "4th Argument", RegisterType.CALLER_SAVED),
+  RDX ("rdx", "3rd Argument", RegisterType.CALLER_SAVED),
+  RSI ("rsi", "2nd Argument", RegisterType.CALLER_SAVED),
+  RDI ("rdi", "1st Argument", RegisterType.CALLER_SAVED),
+  RBP ("rbp", "", RegisterType.SPECIAL), // Technically not a special register, but will be treated as one
+  RSP ("rsp", "Stack Pointer", RegisterType.SPECIAL),
   R8D ("r8d", "5th Argument", RegisterType.CALLER_SAVED),
   R9D ("r9d", "6th Argument", RegisterType.CALLER_SAVED),
   R10D ("r10d", "", RegisterType.CALLEE_SAVED),
@@ -23,7 +23,7 @@ public enum Register {
   R14D ("r14d", "", RegisterType.CALLEE_SAVED),
   R15D ("r15d", "", RegisterType.CALLEE_SAVED);
   
-  private enum RegisterType {
+  public enum RegisterType {
     CALLEE_SAVED,
     CALLER_SAVED,
     SPECIAL;
@@ -39,10 +39,10 @@ public enum Register {
   private static ArrayList<Register> arguments = new ArrayList<Register>();
   
   static {
-    arguments.add(EDI);
-    arguments.add(ESI);
-    arguments.add(EDX);
-    arguments.add(ECX);
+    arguments.add(RDI);
+    arguments.add(RSI);
+    arguments.add(RDX);
+    arguments.add(RCX);
     arguments.add(R8D);
     arguments.add(R9D);
     
@@ -87,8 +87,9 @@ public enum Register {
     return (HashSet<Register>)calleeSaved.clone();
   }
   
+  @SuppressWarnings("unchecked")
   public static HashSet<Register> getCallerSaved() {
-    return (HashSet<Register>)callerSaved;
+    return (HashSet<Register>)callerSaved.clone();
   }
   
   @SuppressWarnings("unchecked")
