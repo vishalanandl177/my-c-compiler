@@ -26,7 +26,7 @@ public class CodeGenerator{
     if(currentFunction == null)
       System.err.println("ERROR: currentFunction is null");
       
-    this.currentBlock.pushInstructionToBlock(i);
+    this.currentBlock.pushInstruction(i);
   }
 
   public void pushInformation(Object o){
@@ -81,6 +81,7 @@ public void startFunctionDefinition(){
     Function f = new Function(name, returnType, parameters, body);
     globalFunctions.add(f);
     this.currentFunction = f;
+    this.currentBlock = f.body.mainBlock;
   }
   
   public void startBlockDefinition() {

@@ -321,9 +321,9 @@ instruct_list ::=
 instruction ::=
     
     // Compare the value of a variable with that of an expression
-    IDENT EQL expression:e
-      {: if(Parser.DEBUG) System.out.println("instruction detected: EQL"); //TODO check state of expression
-         parser.cg.pushInstruction(new Instruction(e, InstructionType.EQL)); :}
+    IDENT:i EQL expression:e
+      {: if(Parser.DEBUG) System.out.println("instruction detected: EQL");
+         parser.cg.pushInstruction(new Instruction(new ArithmeticResult<String>(null, i), e, InstructionType.EQL)); :}
     
     // Compare the value of an item from an array with that of an expression
     // The index may be obtained with an expression
@@ -389,7 +389,7 @@ expression ::=
 
     // Allows the use of a function in an expression
   | IDENT LPAREN arg_sequence RPAREN
-      //{: RESULT = new FunctionResult(); :}
+      //{: RESULT = new FunctionCall(); :}
   
     // Allows the use of arrays with expression calculated indexes
   | IDENT LHOOK expression RHOOK
