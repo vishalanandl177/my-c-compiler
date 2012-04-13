@@ -31,15 +31,15 @@ public class RegisterManager {
    * Returns a Register that has no assigned variable.
    * 'e' for callee-saved, 'r' for caller-saved
    **/
-  public Register getFreeRegister(char type) {
+  public Register getFreeRegister(Register.RegisterType type) {
     ArrayList<HashSet<Register>> al = new ArrayList<HashSet<Register>>();
     HashSet<Register> list;
     switch(type) {
-      case 'r':
+      case CALLER_SAVED:
         list = Register.getCallerSaved();
         al.add(list);
         break;
-      case 'e':
+      case CALLEE_SAVED:
         list = Register.getCalleeSaved();
         al.add(list);
         break;
@@ -70,18 +70,16 @@ public class RegisterManager {
   /**
    * Returns a pair of Registers, in order to perform more complex tasks
    **/
-  public SimpleEntry<Register, Register> getTwoRegisters(char type) { // TODO Resolve : When two registers are called upon, they will both have the same type ? (yes ?)
-
-    
+  public SimpleEntry<Register, Register> getTwoRegisters(Register.RegisterType type) { // TODO Resolve : When two registers are called upon, they will both have the same type ? (yes ?)
     ArrayList<HashSet<Register>> al = new ArrayList<HashSet<Register>>();   
     HashSet<Register> list;
     
     switch(type) {
-      case 'r':
+      case CALLER_SAVED:
         list = Register.getCallerSaved();
         al.add(list);
         break;
-      case 'e':
+      case CALLEE_SAVED:
         list = Register.getCalleeSaved();
         al.add(list);
         break;
@@ -110,27 +108,14 @@ public class RegisterManager {
     }
 
 
-    System.err.println("Assigning two registers failed"); // This should never happen unless the code is faulty
+    System.err.println("Assigning two registers failed");
     return null; //TODO attempt to free two registers by pushing some to the stack
   }
   
   /**
    * Adds the variable var to a free register of type "type"
    **/
-  public Register addVariableToRegister(String var, char type) {
-    String tmp;
-    
-    String str;
-    switch(type) {
-      case 'r':
-        str = new String("CALLER_SAVED");
-        break;
-      case 'e':
-        str = new String("CALLEE_SAVED");
-        break;
-      default:
-        str = new String("SPECIAL");
-    }
+  public Register addVariableToRegister(String var, Register.RegisterType type) {
     
     if(!isListedVariable(var)) {
       Register r = this.getFreeRegister(type);
@@ -140,9 +125,8 @@ public class RegisterManager {
     } else {
       Set<Register> regSet = this.usedRegisters.keySet();
       for(Register reg : regSet) {
-        if(reg.getTypeString().equals(str)) {
-          tmp = this.usedRegisters.get(reg);
-          if(tmp.equals(var))
+        if(reg.getType().equals(type)) {
+          if(this.usedRegisters.get(reg).equals(var))
             return reg;
         } else {
           freeRegister(reg);
@@ -152,7 +136,33 @@ public class RegisterManager {
         }
       }
     }
-    System.err.println("Variable was listed, but no corresponding Register was found in usedRegisters"); // This should never happen, unless the code is faulty
+    System.err.println("Variable was listed, but no corresponding Register was found in usedRegisters");
+    return null;
+  }
+  
+  public SimpleEntry<Register, Register> addTwoVariablesToRegisters(String var1, String var2, Register.RegisterType type) {
+    Register r1, r2;
+    SimpleEntry<Register, Register> se;
+    
+    boolean b1, b2;
+    b1 = !isListedVariable(var1);
+    b2 = !isListedVariable(var2);
+    if(b1 && b2) {
+      se = getTwoRegisters(type);
+      r1 = se.getKey();
+      this.usedRegisters.put(r1, var1);
+      r2 = se.getValue();
+      this.usedRegisters.put(r2, var2);
+      return se;
+    }
+    
+    r1 = addVariableToRegister(var1, type);
+    r2 = addVariableToRegister(var2, type);
+
+    if(r1 != null && r2 != null)
+      return new SimpleEntry<Register, Register>(r1, r2);
+      
+    System.err.println("One or several of the registers were null");
     return null;
   }
   
@@ -187,7 +197,7 @@ public class RegisterManager {
   }
   
 
-  public Register freeUselessRegister(char type) {
+  public Register freeUselessRegister(Register.RegisterType type) {
     /* 
      * TODO find a register that can be removed from the list of used registers with the "type" category
      * IMPORTANT to establish the constraints required on freeing registers
@@ -197,26 +207,33 @@ public class RegisterManager {
   
   public static void main(String[] args) {
     RegisterManager rm = new RegisterManager();
-    SimpleEntry<Register, Register> se; // = new SimpleEntry<Register, Register>();
-    se = rm.getTwoRegisters('e');
-    Register r1 = rm.addVariableToRegister("a", 'e');
+    SimpleEntry<Register, Register> se;
+    se = rm.addTwoVariablesToRegisters("a", "b", Register.RegisterType.CALLEE_SAVED);
+    System.out.println(se.toString());
+    se = rm.addTwoVariablesToRegisters("c", "d", Register.RegisterType.CALLEE_SAVED);
+    System.out.println(se.toString());
+    se = rm.addTwoVariablesToRegisters("a", "c", Register.RegisterType.CALLEE_SAVED);
+    System.out.println(se.toString());
+    se = rm.addTwoVariablesToRegisters("a", "c", Register.RegisterType.CALLER_SAVED);
+    System.out.println(se.toString());
+    /*Register r1 = rm.addVariableToRegister("a", 'e');
     Register r2 = rm.addVariableToRegister("b", 'e');
     Register r3 = rm.addVariableToRegister("c", 'e');
     Register r4 = rm.addVariableToRegister("d", 'e');
     Register r5 = rm.addVariableToRegister("b", 'e');
-    /*Register r6 = rm.addVariableToRegister("e", 'e');
+    Register r6 = rm.addVariableToRegister("e", 'e');
     Register r7 = rm.addVariableToRegister("f", 'e');
     Register r8 = rm.addVariableToRegister("g", 'e');
     Register r9 = rm.addVariableToRegister("h", 'e');
     Register r10 = rm.addVariableToRegister("i", 'e');
-    System.out.println(r.toString());*/
+    System.out.println(r.toString());
     System.out.println("se : " + se.toString());
     System.out.println("r1 : " + r1.toString());
     System.out.println("r2 : " + r2.toString());
     System.out.println("r3 : " + r3.toString());
     System.out.println("r4 : " + r4.toString());
     System.out.println("r5 : " + r5.toString());
-    /*System.out.println("r6 : " + r6.toString());
+    System.out.println("r6 : " + r6.toString());
     System.out.println("r7 : " + r7.toString());
     System.out.println("r8 : " + r8.toString());
     System.out.println("r9 : " + r9.toString());
